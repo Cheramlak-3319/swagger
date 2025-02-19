@@ -24,6 +24,7 @@ paths:
         required: false
         schema:
           type: integer
+          format: int32
           example: 10
       - in: query
         name: Page
@@ -35,32 +36,37 @@ paths:
           example: 1
       - in: query
         name: userId
-        description: Unique identifier for the user
+        description: |
+          Unique identifier for the user with in 6 digits
+          - Examples: `123456`, `123457`, `123458`
         required: false
         schema:
          type: integer
          format: int32
-         example: 12345
-      - in: query
-        name: mobile
-        description: User's mobile number
-        required: false
-        schema:
-         type: string
-         example: "2514567890"
+      -  in: query
+         name: mobile
+         description: |
+           The **international dial code** used to filter results by country.
+           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+         required: false
+         schema:
+           type: string
       - in: query
         name: project
         description: Project name, replaced with 'Palladium' if it contains 'Standard'
         required: false
         schema:
           type: string
-          example: "Standard Palladium"	
+          example: "Palladium"	
       - in: query
         name: countryCode
-        description: Country code for filtering results based on ISO-3166
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
+          pattern: "^[A-Z]{2}$"
           example: "ET"
       - in: query
         name: active
@@ -68,6 +74,7 @@ paths:
         required: false
         schema:
           type: string
+          enum: ["1", "0"]
           example: "1"
       responses:
         '200':
@@ -90,7 +97,7 @@ paths:
                       properties:
                         userid: 
                           type: string
-                          example: "190065"
+                          example: "123456"
                         fullname: 
                           type: string
                           example: "hello shop"
@@ -205,19 +212,24 @@ paths:
           type: integer
           format: int32
           example: 1
-      - in: query
-        name: mobile
-        description: User's mobile number
-        required: false
-        schema:
-         type: string
-         example: "2514567890"
+      -  in: query
+         name: mobile
+         description: |
+           The **international dial code** used to filter results by country.
+           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+         required: false
+         schema:
+           type: string
+           example: "+251"
       - in: query
         name: countryCode
-        description: Country code for filtering results based on ISO-3166
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
+          pattern: "^[A-Z]{2}$"
           example: "ET"
       responses:
         '200':
@@ -240,7 +252,7 @@ paths:
                       properties:
                         userid: 
                           type: string
-                          example: "190065"
+                          example: "123456"
                         fullname: 
                           type: string
                           example: "hello shop"
@@ -267,7 +279,7 @@ paths:
                           example: "Sabrin Selal"
                         merchantUserId: 
                           type: string
-                          example: "367404"
+                          example: "123456"
                         active:
                           type: string
                           example: "1"
@@ -387,7 +399,7 @@ paths:
                           example: "Gesese Molla"
                         merchantUserId:
                           type: string
-                          example: "143700"
+                          example: "123456"
                         merchantMobile:
                           type: string
                           example: "251938905964"
@@ -471,19 +483,24 @@ paths:
           type: integer
           format: int32
           example: 1
-      - in: query
-        name: mobile
-        description: User's mobile number
-        required: false
-        schema:
-          type: string
-          example: "251913663497"
+      -  in: query
+         name: mobile
+         description: |
+           The **international dial code** used to filter results by country.
+           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+         required: false
+         schema:
+           type: string
+           example: "+251"
       - in: query
         name: countryCode
-        description: Country code for filtering results based on ISO-3166
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
+          pattern: "^[A-Z]{2}$"
           example: "ET"
       responses:
         '200':
@@ -659,7 +676,7 @@ paths:
                           example: "MERCHANT_AVAILABL"
                         userId:
                           type: string
-                          example: "895420"
+                          example: "123456"
                         transactionID:
                           type: string
                           example: "DWT1739431037040007"
@@ -799,11 +816,14 @@ paths:
           example: 1
       - in: query
         name: countryCode
-        description: Country code for filtering projects
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
-          example: "KE"
+          pattern: "^[A-Z]{2}$"
+          example: "ET"
       responses:
         '200':
           description: A JSON array of user names
@@ -885,19 +905,25 @@ paths:
           type: integer
           format: int32
           example: 10
-      - in: query
-        name: mobile
-        description: User's mobile number
-        required: false
-        schema:
-          type: string
-          example: "251911541613"
+      -  in: query
+         name: mobile
+         description: |
+           The **international dial code** used to filter results by country.
+           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+           The placeholder value will be `+XXX` until the user enters a valid dial code.
+         required: false
+         schema:
+           type: string
+           example: "+251"
       - in: query
         name: countryCode
-        description: Country code for filtering results
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
+          pattern: "^[A-Z]{2}$"
           example: "ET"
       - in: query
         name: offset
@@ -943,7 +969,7 @@ paths:
                           example: "251991152362"
                         userId: 
                           type: string
-                          example: "259678"
+                          example: "123456"
                         status:
                           type: string
                           example: "1"
@@ -990,10 +1016,13 @@ paths:
           example: 10
       - in: query
         name: countryCode
-        description: Country code for filtering results
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
+          pattern: "^[A-Z]{2}$"
           example: "ET"
       - in: query
         name: page
@@ -1114,19 +1143,24 @@ paths:
           type: integer
           format: int32
           example: 1
-      - in: query
-        name: mobile
-        description: User's mobile number
-        required: false
-        schema:
-         type: string
-         example: "255911541613"
+      -  in: query
+         name: mobile
+         description: |
+           The **international dial code** used to filter results by country.
+           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+         required: false
+         schema:
+           type: string
+           example: "+251"
       - in: query
         name: countryCode
-        description: Country code for filtering results
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
+          pattern: "^[A-Z]{2}$"
           example: "ET"
       responses:
         '200':
@@ -1149,7 +1183,7 @@ paths:
                       properties:
                         userid: 
                           type: string
-                          example: "190065"
+                          example: "123456"
                         fullname: 
                           type: string
                           example: "hello shop"
@@ -1410,7 +1444,7 @@ paths:
                           example: "Gesese Molla"
                         merchantUserId:
                           type: string
-                          example: "143700"
+                          example: "123456"
                         merchantMobile:
                           type: string
                           example: "251938905964"
@@ -1708,18 +1742,25 @@ paths:
         schema: 
           type: integer
           format: int32
-      - in: query
-        name: mobile
-        description: User's mobile number
-        required: false
-        schema:
-         type: string
+      -  in: query
+         name: mobile
+         description: |
+           The **international dial code** used to filter results by country.
+           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+         required: false
+         schema:
+           type: string
+           example: "+251"
       - in: query
         name: countryCode
-        description: Country code for filtering results
+        description: |
+          The **ISO 3166-1 alpha-2** country code used to filter results by country.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
         required: false
         schema:
           type: string
+          pattern: "^[A-Z]{2}$"
+          example: "ET"
       responses:
         '200':
           description: A JSON array of user names
@@ -2086,7 +2127,7 @@ paths:
               properties:
                 userId:
                   type: string
-                  example: "190065"
+                  example: "123456"
                 toMobile:
                   type: string
                   example: "255710101010"
@@ -2151,7 +2192,7 @@ paths:
               properties:
                 userId:
                   type: string
-                  example: "190065"
+                  example: "123456"
                 fullName:
                   type: string
                   example: "John Doe"
@@ -2219,7 +2260,7 @@ paths:
                       properties:
                         userId: 
                           type: string
-                          example: "296556"
+                          example: "123456"
                         balance: 
                           type: number
                           example: 895
@@ -2622,7 +2663,7 @@ paths:
                           example: "WFPWP8923034201839"
                         merchantUserId:
                           type: string
-                          example: "143700"
+                          example: "123456"
                         merchantName: 
                           type: string
                           example: "Gesese Molla"
@@ -2920,7 +2961,7 @@ paths:
                           example: "1"
                         userId:
                           type: string
-                          example: "Snacks"
+                          example: "123456"
                         name:
                           type: string
                           example: "1000"
