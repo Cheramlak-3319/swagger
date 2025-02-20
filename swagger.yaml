@@ -47,7 +47,7 @@ paths:
          name: mobile
          description: |
            The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
          required: false
          schema:
            type: string
@@ -62,7 +62,7 @@ paths:
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
@@ -106,7 +106,7 @@ paths:
                           example: "hello shop"
                         mobile:
                           type: string
-                          example: "255710101010"
+                          example: "251912345678"
                         createdon:
                           type: string
                           example: "2024-11-12 07:08:55"
@@ -118,7 +118,7 @@ paths:
                           example: "0.00"
                         bnpl:
                           type: string
-                          example: "200000.00"
+                          example: "0.00"
                         active:
                           type: string
                           example: "1"
@@ -135,10 +135,10 @@ paths:
                             properties:
                               name:
                                 type: string
-                                example: "1190073738"
+                                example: "1234567890"
                               wallettype:
                                 type: string
-                                example: "MERCHANT_CREDIT"
+                                example: "MERCHANT_AVILABLE"
                               balance:
                                 type: string
                                 example: "2000000"
@@ -146,18 +146,18 @@ paths:
                                 type: string
                                 example: "2000000"
                           example:
-                          - name: "1190073738"
+                          - name: "0.00"
                             wallettype: "MERCHANT_CREDIT"
                             balance: "2000000"
-                            bnpl: "2000000"
+                            bnpl: "0.00"
                           - name: "1451013738"
-                            wallettype: "MERCHANT_AVAILABLE"
-                            balance: "1500000"
-                            bnpl: "1500000"
-                          - name: "4197613738"
                             wallettype: "MERCHANT_EARNING"
-                            balance: "1500000"
-                            bnpl: "1500000"
+                            balance: "0.00"
+                            bnpl: "0.00"
+                          - name: "4197613738"
+                            wallettype: "MERCHANT_AVAILABLE"
+                            balance: "0.00"
+                            bnpl: "0.00"
                         foodCategory: 
                           type: string
                           example: "desert"
@@ -203,7 +203,6 @@ paths:
         schema:
           type: integer
           format: int32
-          example: 10
       - in: query
         name: Page
         description: Page number for pagination
@@ -211,26 +210,22 @@ paths:
         schema: 
           type: integer
           format: int32
-          example: 1
       -  in: query
          name: mobile
          description: |
            The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
          required: false
          schema:
            type: string
-           example: "+251"
       - in: query
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
       responses:
         '200':
           description: List of customers retrieved successfully
@@ -258,10 +253,10 @@ paths:
                           example: "hello shop"
                         mobile:
                           type: string
-                          example: "255710101010"
+                          example: "25112345678"
                         creditwallet:
                           type: string
-                          example: "8376940003"
+                          example: "1234567890"
                         purchasewallet: 
                           type: string
                           example: "1234567890"
@@ -276,7 +271,7 @@ paths:
                           example: "233900000002"
                         merchantName:
                           type: string
-                          example: "Sabrin Selal"
+                          example: "hello shop"
                         merchantUserId: 
                           type: string
                           example: "123456"
@@ -285,7 +280,7 @@ paths:
                           example: "1"
                         bnpl:
                           type: string
-                          example: "200000.00"
+                          example: "0.00"
                         otheCreditLines:
                           type: array
                           description: List of other credit lines (if any)
@@ -335,27 +330,30 @@ paths:
       parameters:
       - in: query
         name: wallet
-        description: Wallet identifier or type
+        description: |
+          Wallet identifier or type
+          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
         required: false
         schema:
           type: string
-          example: "1234567890"
       - in: query
         name: start
-        description: Start date or parameter for filtering
+        description: |
+          Start date or parameter for filtering
+          - Example: `"2024-01-01"`
         required: false
         schema:
           type: string
           format: date-time
-          example: "2024-01-01 00:00:00"
       - in: query
         name: end
-        description: End date or parameter for filtering
+        description: |
+          End date or parameter for filtering
+          - Example: `"2024-12-31"`
         required: false
         schema:
           type: string
           format: date-time
-          example: "2024-12-31 23:59:59"
       - in: query
         name: limit
         description: Number of results to return
@@ -396,19 +394,19 @@ paths:
                           example: "WFPWP1234567890123"
                         merchantName: 
                           type: string
-                          example: "Gesese Molla"
+                          example: "Hello Shop"
                         merchantUserId:
                           type: string
                           example: "123456"
                         merchantMobile:
                           type: string
-                          example: "251938905964"
+                          example: "251912345678"
                         customerName: 
                           type: string
-                          example: "Mulushewa Moges"
+                          example: "Hello Market"
                         customerMobile: 
                           type: string
-                          example: "251913663497"
+                          example: "251987654332"
                         amount:
                           type: number
                           example: 933.68
@@ -417,13 +415,13 @@ paths:
                           example: "2025-02-13 08:11:26"
                         transactionStatus:
                           type: string
-                          example: "FAILED"
+                          example: "PROCESSED/FAILED"
                         dueDate:
                           type: string
                           example: "2027-02-13 08:10:50"
                         overdue:
                           type: boolean
-                          example: false
+                          example: true|false
                         repayed:
                           type: string
                           example: "0"
@@ -465,7 +463,7 @@ paths:
       tags:
         - Dube International
       summary: Get Repayment History list
-      description: Get an existing Repayment History list
+      description: Retrive an existing Repayment History list
       parameters:
       - in: query
         name: limit
@@ -487,24 +485,21 @@ paths:
          name: mobile
          description: |
            The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
          required: false
          schema:
            type: string
-           example: "+251"
       - in: query
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
       responses:
         '200':
-          description: A JSON array of user names
+          description: List of Repayment History successfully 
           content:
             application/json:
               schema:
@@ -523,19 +518,22 @@ paths:
                       properties:
                         transactionList: 
                           type: string
-                          example: "DW74818394Laa0003"
+                          example: "DW12345678AbC1234"
                         transactionID: 
                           type: string
-                          example: "DWCRmVj4F6NR50003"
+                          example: "DWCRAbCdRA00000"
                         paidFrom:
                           type: string
                           example: "9733770001"
                         payerName:
                           type: string
-                          example: "Eliana Tewodros"
+                          example: "Hello Shop"
                         payerMobile:
                           type: string
-                          example: "233900000003"
+                          example: "251900000000"
+                        payerUserId:
+                          type: string
+                          example: "123456"
                         repaidAmount:
                           type: string
                           example: "0.00"
@@ -545,39 +543,24 @@ paths:
                         repaymentDate:
                           type: string
                           example: "2024-11-15 14:46:27"
-                        wallets:
+                        invoice:
                           type: array
                           items:
                             type: object
                             properties:
-                              name:
+                              transactionId:
                                 type: string
-                                example: "1190073738"
+                                example: "DWCRAbCdRA00000"
                               wallettype:
                                 type: string
                                 example: "MERCHANT_CREDIT"
-                              balance:
+                              amount:
+                                type: number
+                                example: 10
+                              transactionDate:
                                 type: string
-                                example: "2000000"
-                              bnpl:
-                                type: string
-                                example: "2000000"
-                          example:
-                          - name: "1190073738"
-                            wallettype: "MERCHANT_CREDIT"
-                            balance: "2000000"
-                            bnpl: "2000000"
-                          - name: "1451013738"
-                            wallettype: "MERCHANT_AVAILABLE"
-                            balance: "1500000"
-                            bnpl: "1500000"
-                          - name: "4197613738"
-                            wallettype: "MERCHANT_EARNING"
-                            balance: "1500000"
-                            bnpl: "1500000"
-                        foodCategory: 
-                          type: string
-                          example: "desert"
+                                format: date-time
+                                example: "2024-11-15 14:46:27"
         "400":
             description: Bad request. The provided data is invalid or missing required fields.
             content:
@@ -613,27 +596,30 @@ paths:
       parameters:
       - in: query
         name: wallet
-        description: Wallet identifier or type
+        description: |
+          Wallet identifier or type
+          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
         required: false
         schema:
           type: string
-          example: "1190073738"
       - in: query
         name: start
-        description: Start date or parameter for filtering
+        description: |
+          Start date or parameter for filtering
+          - Example: `"2024-01-01"`
         required: false
         schema:
           type: string
           format: date-time
-          example: "2025-02-13T08:11:26"
       - in: query
         name: end
-        description: End date or parameter for filtering
+        description: |
+          End date or parameter for filtering
+          - Example: `"2024-12-31"`
         required: false
         schema:
           type: string
           format: date-time
-          example: "2027-02-13T08:10:50"
       - in: query
         name: limit
         description: Number of results to return
@@ -670,7 +656,7 @@ paths:
                           example: "nana Market"
                         mobile: 
                           type: string
-                          example: "251900000007"
+                          example: "251900000000"
                         walletType:
                           type: string
                           example: "MERCHANT_AVAILABL"
@@ -679,22 +665,22 @@ paths:
                           example: "123456"
                         transactionID:
                           type: string
-                          example: "DWT1739431037040007"
+                          example: "DWT1020304050600000"
                         financialInstitution:
                           type: string
-                          example: "Cash"
+                          example: "Bank of Abyssinia"
                         amount:
                           type: string
-                          example: "0.00"
+                          example: "10.00"
                         invoiceID:
                           type: string
-                          example: "5KE23BJDN1F9IMG107J6EOFYWQ7XLEOL"
+                          example: "1739874588-2162574953"
                         InvoiceReference:
                           type: string
-                          example: "77346335"
+                          example: "202502181329491891797258803220481"
                         tracenumber:
                           type: string
-                          example: "HelloDubeApp-1739273244"
+                          example: "https://app.ethiomobilemoney.et:2121/ammwebpay/#/?transactionNo=202502123456789091797258803220481"
                         transactionStatus:
                           type: string
                           example: "PROCESSED"
@@ -706,16 +692,16 @@ paths:
                           properties:
                             from:
                               type: string
-                              example: "+251911541613"
+                              example: "+251912345678"
                             fromname:
                               type: string
-                              example: "Biniyam Asfaw Idosa"
+                              example: "Hello Marketplace"
                             fromaccount:
                               type: string
-                              example: "730060614421"
+                              example: "000012334421"
                             to:
                               type: string
-                              example: "3109191"
+                              example: "0109091"
                             toname:
                               type: string
                               example: "AMASIS B"
@@ -745,7 +731,7 @@ paths:
                               example: "https://bill.mamapays.com/U2diMlZjN2ItYTZGWS1odzFmLWVPV2otYll0Um90Y1FLZGc4/pay"
                             tracenumber:
                               type: string
-                              example: "https://app.ethiomobilemoney.et:2121/ammwebpay/#/?transactionNo=202502112058481889373534979391490"
+                              example: "1739874588-2162574953"
                             invoiceid:
                               type: string
                               example: "5KE23BJDN1F9IMG107J6EOFYWQ7XLEOL"
@@ -763,7 +749,7 @@ paths:
                               example: "PROCESSED"
                             system:
                               type: string
-                              example: "lion"
+                              example: "Bank of Abyssinia"
 
         "400":
             description: Bad request. The provided data is invalid or missing required fields.
@@ -818,12 +804,10 @@ paths:
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
       responses:
         '200':
           description: A JSON array of user names
@@ -845,19 +829,19 @@ paths:
                       properties:
                         projectName: 
                           type: string
-                          example: "Standard_KP"
+                          example: "Standard_ET"
                         countryCode: 
                           type: string
-                          example: "KP"
+                          example: "ET"
                         countryName:
                           type: string
-                          example: "Korea North"
+                          example: "Ethiopia"
                         creditDisbursementWallet:
                           type: string
-                          example: "6344996915"
+                          example: "1234567890"
                         earningWallet: 
                           type: string
-                          example: "1638786915"
+                          example: "0987654321"
                         settlementBank: 
                           type: string
                           example: ""
@@ -909,22 +893,18 @@ paths:
          name: mobile
          description: |
            The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
-           The placeholder value will be `+XXX` until the user enters a valid dial code.
+           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
          required: false
          schema:
            type: string
-           example: "+251"
       - in: query
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
       - in: query
         name: offset
         description: Pagination offset
@@ -954,7 +934,7 @@ paths:
                       properties:
                         name: 
                           type: string
-                          example: "Gelila Yacob"
+                          example: "hello shop"
                         wallet: 
                           type: string
                           example: "2244972362"
@@ -1018,12 +998,10 @@ paths:
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
       - in: query
         name: page
         description: Page number for pagination
@@ -1094,6 +1072,9 @@ paths:
                               hellooMarketOrderId:
                                 type: string
                                 example: "20232"
+                        status:
+                              type: string
+                              example: "RECEIVED"
         "400":
             description: Bad request. The provided data is invalid or missing required fields.
             content:
@@ -1147,21 +1128,18 @@ paths:
          name: mobile
          description: |
            The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
+           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
          required: false
          schema:
            type: string
-           example: "+251"
       - in: query
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
       responses:
         '200':
           description: A JSON array of user names
@@ -1222,6 +1200,593 @@ paths:
                               giftBalance:
                                 type: string
                                 example: "2.00"
+                              lable:
+                                type: string
+                                example: "Hello Shop Gift"
+                              theme:
+                                type: string
+                                example: "Hello Shop"
+                              sponsorName:
+                                type: string
+                                example: "Yegha Plc"
+                              sponsorPhone:
+                                type: string
+                                example: "255710101010"
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getopeninvoices.php:
+    get:
+      tags:
+        - Dube International
+      summary: Get All Open Invoices
+      description: Retrive an existing All Open Invoices list
+      parameters:
+      - in: query
+        name: wallet
+        description: |
+          Wallet identifier or type
+          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: start
+        description: |
+          Start date or parameter for filtering
+          - Example: `"2024-01-01"`
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: end
+        description: |
+          End date or parameter for filtering
+          - Example: `"2024-12-31"`
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: limit
+        description: Number of results to return
+        required: false
+        schema:
+          type: integer
+          format: int32
+          example: 10
+      - in: query
+        name: offset
+        description: Pagination offset
+        required: false
+        schema:
+          type: integer
+          format: int32
+          example: 0  
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  totalCount:
+                    type: string
+                    example: "2792"
+                  message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        transactionID: 
+                          type: string
+                          example: "DW12345678AbC1234"
+                        amount: 
+                          type: string
+                          example: 10
+                        customerCreditWallet:
+                          type: string
+                          example: "9733770001"
+                        customerName:
+                          type: string
+                          example: "Hello Shop"
+                        customerMobile:
+                          type: string
+                          example: "251900000000"
+                        transactionDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-15 14:46:27"
+                        dueDate:
+                          type: string
+                          example: "2024-11-15 14:46:27"
+                        overdue:
+                          type: boolean
+                          example: true|false
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getcustomercredithistory.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get All Customer Credit History
+      description: Retrive an existing All Open Invoices list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - wallet
+                - start
+                - end
+                - limit
+                - offset
+              properties:
+                wallet:
+                  type: string
+                  example: "1234567890"
+                start:
+                  type: string
+                  example: "2024-01-01"
+                end:
+                  type: string
+                  example: "2024-12-31"
+                limit:
+                  type: integer
+                  format: int32
+                  example: 10
+                offset:
+                  type: integer
+                  format: int32
+                  example: 0
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  totalCount:
+                    type: string
+                    example: "2792"
+                  message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        transactionId: 
+                          type: string
+                          example: "DW12345678AbC1234"
+                        senderName: 
+                          type: string
+                          example: "HelloDube"
+                        senderMobile:
+                          type: string
+                          example: "251900000000"
+                        creditAmount:
+                          type: string
+                          example: "9733"
+                        transactionStatus:
+                          type: string
+                          example: "PROCESSED"
+                        transactionDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-15 14:46:27"
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getpaymenthistory.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get All Payment History
+      description: Retrive an existing Payment History
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - wallet
+                - start
+                - end
+                - limit
+                - offset
+              properties:
+                wallet:
+                  type: string
+                  example: "1234567890"
+                start:
+                  type: string
+                  example: "2024-01-01"
+                end:
+                  type: string
+                  example: "2024-12-31"
+                limit:
+                  type: integer
+                  format: int32
+                  example: 10
+                offset:
+                  type: integer
+                  format: int32
+                  example: 0
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  totalCount:
+                    type: string
+                    example: "2792"
+                  message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        transactionId: 
+                          type: string
+                          example: "DW12345678AbC1234"
+                        payerName: 
+                          type: string
+                          example: "HelloDube"
+                        payerMobile:
+                          type: string
+                          example: "251900000000"
+                        paidAmount:
+                          type: string
+                          example: "200000"
+                        receivedAmount:
+                          type: string
+                          example: "19000"
+                        transactionStatus:
+                          type: string
+                          example: "PROCESSED"
+                        transactionDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-15 14:46:27"
+                        remark:
+                          type: string
+                          example: "invoice"
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/international/updatereceiptstatus.php:
+    post:
+      tags:
+        - Dube International
+      summary: Update Receipt Status
+      description: Update Receipt Status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - status
+              properties:
+                id:
+                  type: string
+                  example: "7Gq5Xaje-XGMQ-CjaX-ZoDI-cmQnUR4My4bs"
+                status:
+                  type: string
+                  enum: "1 | 0"
+                  example: "1"
+      responses:
+        "201":
+          description: Receipt Updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Receipt Updated successfully."
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getcashouthistory.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get Single Cashout History
+      description: Retrive Get Single Cashout History
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - wallet
+              - id
+              properties:
+                wallet:
+                  type: string
+                  example: "1234567890"
+                id:
+                  type: string
+                  example: "DW12345678AbC1234"
+      responses:
+        "201":
+          description: Receipt Updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: object
+                    properties:
+                      wallet: 
+                        type: string
+                        example: "2299401133"
+                      name: 
+                        type: string
+                        example: "hello shop"
+                      mobile:
+                        type: string
+                        example: "251900000000"
+                      bank:
+                        type: string
+                        example: "Bank of Abyssinia"
+                      accountNumber:
+                        type: string
+                        example: "1234567890"
+                      amount:
+                        type: string
+                        example: "10.00"
+                      status:
+                        type: string
+                        example: "PROCESSED"
+                      requestDate:
+                        type: string
+                        example: "2024-11-15 14:46:27"
+                      transactionDate:
+                        type: object
+                        properties:
+                          error:
+                            type: boolean
+                            example: false
+                          message:
+                            type: string
+                            example: "Successfully Transfered."
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getcustomerlistofmerchant.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get Single Customer list of Merchant
+      description: Retrive Get Single Customer list of Merchant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - mobile
+              properties:
+                mobile:
+                  type: string
+                  example: "251900000000"
+      responses:
+        "201":
+          description: Receipt Updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: object
+                    properties:
+                      userId: 
+                        type: string
+                        example: "123456"
+                      walletType: 
+                        type: string
+                        example: "CUSTOMER_CREDIT"
+                      fullname:
+                        type: string
+                        example: "hello shop"
+                      mobile:
+                        type: string
+                        example: "251900000000"
+                      wallet: 
+                        type: string
+                        example: "2299401133"
+                      balance:
+                        type: string
+                        example: "10.00"
+                      initialDeposit:
+                        type: string
+                        example: "10.00"
+                      createdOn:
+                        type: string
+                        example: "2024-11-15 14:46:27"
+                      bnplBalance:
+                        type: string
+                        example: "0.00"
+                      creditPayment:
+                        type: array
+                        example: []
+                      creditRepayment:
+                        type: array
+                        example: []
+                      
         "400":
             description: Bad request. The provided data is invalid or missing required fields.
             content:
@@ -1380,27 +1945,30 @@ paths:
       parameters:
       - in: query
         name: wallet
-        description: Wallet identifier or type
+        description: |
+          Wallet identifier or type
+          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
         required: false
         schema:
           type: string
-          example: "345678"
       - in: query
         name: start
-        description: Start date or parameter for filtering
+        description: |
+          Start date or parameter for filtering
+          - Example: `"2024-01-01"`
         required: false
         schema:
           type: string
           format: date-time
-          example: "2024-11-01T00:00:00Z"
       - in: query
         name: end
-        description: End date or parameter for filtering
+        description: |
+          End date or parameter for filtering
+          - Example: `"2024-12-31"`
         required: false
         schema:
           type: string
           format: date-time
-          example: "2024-11-30T23:59:59Z"
       - in: query
         name: limit
         description: Number of results to return
@@ -1755,7 +2323,7 @@ paths:
         name: countryCode
         description: |
           The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"GQ"` for Guinea-Bissau.
+          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
         required: false
         schema:
           type: string
@@ -2109,7 +2677,7 @@ paths:
                   type: string
                   example: "An internal server error occurred."
   /dube/international/changephonenumber.php:
-    put:
+    post:
       tags:
         - Dube International
       summary: Change User PhoneNumber
@@ -2175,7 +2743,7 @@ paths:
                   type: string
                   example: "An internal server error occurred."
   /dube/changename.php:
-    put:
+    post:
       tags:
         - Dube International
       summary: Change User PhoneNumber
@@ -2860,23 +3428,32 @@ paths:
           schema:
             type: integer
           description: Pagination offset.
-        - name: wallet
-          in: query
+        - in: query
+          name: wallet
+          description: |
+            Wallet identifier or type
+            - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
+          required: false
           schema:
             type: string
-          description: Voucher wallet filter.
-        - name: start
-          in: query
+        - in: query
+          name: start
+          description: |
+            Start date or parameter for filtering
+            - Example: `"2024-01-01"`
+          required: false
           schema:
             type: string
-            format: date
-          description: Start date filter.
-        - name: end
-          in: query
+            format: date-time
+        - in: query
+          name: end
+          description: |
+            End date or parameter for filtering
+            - Example: `"2024-12-31"`
+          required: false
           schema:
             type: string
-            format: date
-          description: End date filter.
+            format: date-time
       responses:
         '200':
           description: A JSON array of user names
@@ -3045,18 +3622,24 @@ paths:
           schema:
             type: string
           description: Household ID filter.
-        - name: start
-          in: query
+        - in: query
+          name: start
+          description: |
+            Start date or parameter for filtering
+            - Example: `"2024-01-01"`
+          required: false
           schema:
             type: string
-            format: date
-          description: Start date filter.
-        - name: end
-          in: query
+            format: date-time
+        - in: query
+          name: end
+          description: |
+            End date or parameter for filtering
+            - Example: `"2024-12-31"`
+          required: false
           schema:
             type: string
-            format: date
-          description: End date filter.
+            format: date-time
         - name: cycle
           in: query
           schema:
