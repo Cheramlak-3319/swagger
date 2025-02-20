@@ -1,4 +1,5 @@
 const express = require('express');
+const serverless = require('serverless-http');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path');
@@ -44,16 +45,14 @@ const PORT = 5000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-const swaggerOptions = {
-  customJs: '/swagger-custom.js', // Path to your custom JavaScript file
-};
-
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument,swaggerOptions));
+app.use('/.netlify/functions/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
 });
+
+
+module.exports.handler = serverless(app);

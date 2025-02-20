@@ -1,0 +1,7 @@
+[build]
+  functions = "functions"
+
+[[redirects]]
+  from = "/api-docs"
+  to = "/.netlify/functions/api/api-docs"
+  status = 200
