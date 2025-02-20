@@ -1357,462 +1357,6 @@ paths:
                   message:
                     type: string
                     example: "An internal server error occurred."
-  /dube/getcustomercredithistory.php:
-    post:
-      tags:
-        - Dube International
-      summary: Get All Customer Credit History
-      description: Retrive an existing All Open Invoices list
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - wallet
-                - start
-                - end
-                - limit
-                - offset
-              properties:
-                wallet:
-                  type: string
-                  example: "1234567890"
-                start:
-                  type: string
-                  example: "2024-01-01"
-                end:
-                  type: string
-                  example: "2024-12-31"
-                limit:
-                  type: integer
-                  format: int32
-                  example: 10
-                offset:
-                  type: integer
-                  format: int32
-                  example: 0
-      responses:
-        '200':
-          description: A JSON array of user names
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: false
-                  totalCount:
-                    type: string
-                    example: "2792"
-                  message:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        transactionId: 
-                          type: string
-                          example: "DW12345678AbC1234"
-                        senderName: 
-                          type: string
-                          example: "HelloDube"
-                        senderMobile:
-                          type: string
-                          example: "251900000000"
-                        creditAmount:
-                          type: string
-                          example: "9733"
-                        transactionStatus:
-                          type: string
-                          example: "PROCESSED"
-                        transactionDate:
-                          type: string
-                          format: date-time
-                          example: "2024-11-15 14:46:27"
-        "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-        "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
-  /dube/getpaymenthistory.php:
-    post:
-      tags:
-        - Dube International
-      summary: Get All Payment History
-      description: Retrive an existing Payment History
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - wallet
-                - start
-                - end
-                - limit
-                - offset
-              properties:
-                wallet:
-                  type: string
-                  example: "1234567890"
-                start:
-                  type: string
-                  example: "2024-01-01"
-                end:
-                  type: string
-                  example: "2024-12-31"
-                limit:
-                  type: integer
-                  format: int32
-                  example: 10
-                offset:
-                  type: integer
-                  format: int32
-                  example: 0
-      responses:
-        '200':
-          description: A JSON array of user names
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: false
-                  totalCount:
-                    type: string
-                    example: "2792"
-                  message:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        transactionId: 
-                          type: string
-                          example: "DW12345678AbC1234"
-                        payerName: 
-                          type: string
-                          example: "HelloDube"
-                        payerMobile:
-                          type: string
-                          example: "251900000000"
-                        paidAmount:
-                          type: string
-                          example: "200000"
-                        receivedAmount:
-                          type: string
-                          example: "19000"
-                        transactionStatus:
-                          type: string
-                          example: "PROCESSED"
-                        transactionDate:
-                          type: string
-                          format: date-time
-                          example: "2024-11-15 14:46:27"
-                        remark:
-                          type: string
-                          example: "invoice"
-        "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-        "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
-  /dube/international/updatereceiptstatus.php:
-    post:
-      tags:
-        - Dube International
-      summary: Update Receipt Status
-      description: Update Receipt Status
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - id
-                - status
-              properties:
-                id:
-                  type: string
-                  example: "7Gq5Xaje-XGMQ-CjaX-ZoDI-cmQnUR4My4bs"
-                status:
-                  type: string
-                  enum: "1 | 0"
-                  example: "1"
-      responses:
-        "201":
-          description: Receipt Updated successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Receipt Updated successfully."
-        "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-        "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
-  /dube/getcashouthistory.php:
-    post:
-      tags:
-        - Dube International
-      summary: Get Single Cashout History
-      description: Retrive Get Single Cashout History
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - wallet
-              - id
-              properties:
-                wallet:
-                  type: string
-                  example: "1234567890"
-                id:
-                  type: string
-                  example: "DW12345678AbC1234"
-      responses:
-        "201":
-          description: Receipt Updated successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: false
-                  message:
-                    type: object
-                    properties:
-                      wallet: 
-                        type: string
-                        example: "2299401133"
-                      name: 
-                        type: string
-                        example: "hello shop"
-                      mobile:
-                        type: string
-                        example: "251900000000"
-                      bank:
-                        type: string
-                        example: "Bank of Abyssinia"
-                      accountNumber:
-                        type: string
-                        example: "1234567890"
-                      amount:
-                        type: string
-                        example: "10.00"
-                      status:
-                        type: string
-                        example: "PROCESSED"
-                      requestDate:
-                        type: string
-                        example: "2024-11-15 14:46:27"
-                      transactionDate:
-                        type: object
-                        properties:
-                          error:
-                            type: boolean
-                            example: false
-                          message:
-                            type: string
-                            example: "Successfully Transfered."
-        "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-        "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
-  /dube/getcustomerlistofmerchant.php:
-    post:
-      tags:
-        - Dube International
-      summary: Get Single Customer list of Merchant
-      description: Retrive Get Single Customer list of Merchant
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - mobile
-              properties:
-                mobile:
-                  type: string
-                  example: "251900000000"
-      responses:
-        "201":
-          description: Receipt Updated successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: false
-                  message:
-                    type: object
-                    properties:
-                      userId: 
-                        type: string
-                        example: "123456"
-                      walletType: 
-                        type: string
-                        example: "CUSTOMER_CREDIT"
-                      fullname:
-                        type: string
-                        example: "hello shop"
-                      mobile:
-                        type: string
-                        example: "251900000000"
-                      wallet: 
-                        type: string
-                        example: "2299401133"
-                      balance:
-                        type: string
-                        example: "10.00"
-                      initialDeposit:
-                        type: string
-                        example: "10.00"
-                      createdOn:
-                        type: string
-                        example: "2024-11-15 14:46:27"
-                      bnplBalance:
-                        type: string
-                        example: "0.00"
-                      creditPayment:
-                        type: array
-                        example: []
-                      creditRepayment:
-                        type: array
-                        example: []
-                      
-        "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-        "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
   /dube/international/gettotals.php:
     get:
       tags:
@@ -2804,6 +2348,462 @@ paths:
                 message:
                   type: string
                   example: "An internal server error occurred."
+  /dube/getcustomercredithistory.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get All Customer Credit History
+      description: Retrive an existing All Open Invoices list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - wallet
+                - start
+                - end
+                - limit
+                - offset
+              properties:
+                wallet:
+                  type: string
+                  example: "1234567890"
+                start:
+                  type: string
+                  example: "2024-01-01"
+                end:
+                  type: string
+                  example: "2024-12-31"
+                limit:
+                  type: integer
+                  format: int32
+                  example: 10
+                offset:
+                  type: integer
+                  format: int32
+                  example: 0
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  totalCount:
+                    type: string
+                    example: "2792"
+                  message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        transactionId: 
+                          type: string
+                          example: "DW12345678AbC1234"
+                        senderName: 
+                          type: string
+                          example: "HelloDube"
+                        senderMobile:
+                          type: string
+                          example: "251900000000"
+                        creditAmount:
+                          type: string
+                          example: "9733"
+                        transactionStatus:
+                          type: string
+                          example: "PROCESSED"
+                        transactionDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-15 14:46:27"
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getpaymenthistory.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get All Payment History
+      description: Retrive an existing Payment History
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - wallet
+                - start
+                - end
+                - limit
+                - offset
+              properties:
+                wallet:
+                  type: string
+                  example: "1234567890"
+                start:
+                  type: string
+                  example: "2024-01-01"
+                end:
+                  type: string
+                  example: "2024-12-31"
+                limit:
+                  type: integer
+                  format: int32
+                  example: 10
+                offset:
+                  type: integer
+                  format: int32
+                  example: 0
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  totalCount:
+                    type: string
+                    example: "2792"
+                  message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        transactionId: 
+                          type: string
+                          example: "DW12345678AbC1234"
+                        payerName: 
+                          type: string
+                          example: "HelloDube"
+                        payerMobile:
+                          type: string
+                          example: "251900000000"
+                        paidAmount:
+                          type: string
+                          example: "200000"
+                        receivedAmount:
+                          type: string
+                          example: "19000"
+                        transactionStatus:
+                          type: string
+                          example: "PROCESSED"
+                        transactionDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-15 14:46:27"
+                        remark:
+                          type: string
+                          example: "invoice"
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/international/updatereceiptstatus.php:
+    post:
+      tags:
+        - Dube International
+      summary: Update Receipt Status
+      description: Update Receipt Status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - status
+              properties:
+                id:
+                  type: string
+                  example: "7Gq5Xaje-XGMQ-CjaX-ZoDI-cmQnUR4My4bs"
+                status:
+                  type: string
+                  enum: "1 | 0"
+                  example: "1"
+      responses:
+        "201":
+          description: Receipt Updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Receipt Updated successfully."
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getcashouthistory.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get Single Cashout History
+      description: Retrive Get Single Cashout History
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - wallet
+              - id
+              properties:
+                wallet:
+                  type: string
+                  example: "1234567890"
+                id:
+                  type: string
+                  example: "DW12345678AbC1234"
+      responses:
+        "201":
+          description: Receipt Updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: object
+                    properties:
+                      wallet: 
+                        type: string
+                        example: "2299401133"
+                      name: 
+                        type: string
+                        example: "hello shop"
+                      mobile:
+                        type: string
+                        example: "251900000000"
+                      bank:
+                        type: string
+                        example: "Bank of Abyssinia"
+                      accountNumber:
+                        type: string
+                        example: "1234567890"
+                      amount:
+                        type: string
+                        example: "10.00"
+                      status:
+                        type: string
+                        example: "PROCESSED"
+                      requestDate:
+                        type: string
+                        example: "2024-11-15 14:46:27"
+                      transactionDate:
+                        type: object
+                        properties:
+                          error:
+                            type: boolean
+                            example: false
+                          message:
+                            type: string
+                            example: "Successfully Transfered."
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+  /dube/getcustomerlistofmerchant.php:
+    post:
+      tags:
+        - Dube International
+      summary: Get Single Customer list of Merchant
+      description: Retrive Get Single Customer list of Merchant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - mobile
+              properties:
+                mobile:
+                  type: string
+                  example: "251900000000"
+      responses:
+        "201":
+          description: Receipt Updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: object
+                    properties:
+                      userId: 
+                        type: string
+                        example: "123456"
+                      walletType: 
+                        type: string
+                        example: "CUSTOMER_CREDIT"
+                      fullname:
+                        type: string
+                        example: "hello shop"
+                      mobile:
+                        type: string
+                        example: "251900000000"
+                      wallet: 
+                        type: string
+                        example: "2299401133"
+                      balance:
+                        type: string
+                        example: "10.00"
+                      initialDeposit:
+                        type: string
+                        example: "10.00"
+                      createdOn:
+                        type: string
+                        example: "2024-11-15 14:46:27"
+                      bnplBalance:
+                        type: string
+                        example: "0.00"
+                      creditPayment:
+                        type: array
+                        example: []
+                      creditRepayment:
+                        type: array
+                        example: []
+                      
+        "400":
+            description: Bad request. The provided data is invalid or missing required fields.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: "No content passed."
+        "500":
+          description: Internal server error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
   /wfp/generatedummyvouchers.php:
     get:
       tags:
