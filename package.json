@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "start": "node functions/app.js",
-    "dev": "nodemon functions/app.js"
+    "start": "node functions/index.js",
+    "dev": "nodemon functions/index.js"
   },
   "dependencies": {
     "express": "^4.21.2",

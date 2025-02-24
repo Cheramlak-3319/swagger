@@ -2904,25 +2904,6 @@ paths:
                               allocatedAmount:
                                 type: string
                                 example: "78.75"
-                    example:
-                    - id: "1a723e53-9491-c7ee-e411-670fac008a36"
-                      name: "Vegetables"
-                      allocatedAmount: "79.20"
-                    - id: "11b5cf1c-eda5-0a68-7cd0-675c1b485a8"
-                      name: "1aa3bc29-2249-5ed4-b366-67acf9a02ce0"
-                      allocatedAmount: "78.50"
-                    - walletName: "Vegetables"
-                      name: "Oil"
-                      allocatedAmount: "121.92"
-                    - walletName: "Cereal"
-                      name: "Cereal"
-                      allocatedAmount: "112.43"
-                    - walletName: "Pulses"
-                      name: "Eggs"
-                      allocatedAmount: "543.29"
-                    - walletName: "Salt"
-                      name: "Pulses"
-                      allocatedAmount: "367.92"
         "400":
             description: Bad request. The provided data is invalid or missing required fields.
             content:
@@ -2953,11 +2934,11 @@ paths:
     get:
       tags:
         - WFP
-      summary: Get Categories
-      description: Get All Categories
+      summary: Get Beneficiary list
+      description: Get All Beneficiary list
       responses:
         '200':
-          description: A JSON array of user names
+          description: Successful response with Beneficiary list.
           content:
             application/json:
               schema:
@@ -3000,25 +2981,25 @@ paths:
                               cycle:
                                 type: string
                                 example: "Test Cycle-2"
-                    example:
-                    - walletName: "Oil"
-                      walletBalance: "100.00"
-                      cycle: "Test Cycle-2"
-                    - walletName: "Eggs"
-                      walletBalance: "100.00"
-                      cycle: "Test Cycle-2"
-                    - walletName: "Vegetables"
-                      walletBalance: "100.00"
-                      cycle: "Test Cycle-2"
-                    - walletName: "Cereal"
-                      walletBalance: "100.00"
-                      cycle: "Test Cycle-2"
-                    - walletName: "Pulses"
-                      walletBalance: "100.00"
-                      cycle: "Test Cycle-2"
-                    - walletName: "Salt"
-                      walletBalance: "100.00"
-                      cycle: "Test Cycle-2"
+                          example:
+                          - walletName: "Oil"
+                            walletBalance: "100.00"
+                            cycle: "Test Cycle-2"
+                          - walletName: "Eggs"
+                            walletBalance: "100.00"
+                            cycle: "Test Cycle-2"
+                          - walletName: "Vegetables"
+                            walletBalance: "100.00"
+                            cycle: "Test Cycle-2"
+                          - walletName: "Cereal"
+                            walletBalance: "100.00"
+                            cycle: "Test Cycle-2"
+                          - walletName: "Pulses"
+                            walletBalance: "100.00"
+                            cycle: "Test Cycle-2"
+                          - walletName: "Salt"
+                            walletBalance: "100.00"
+                            cycle: "Test Cycle-2"
         "400":
             description: Bad request. The provided data is invalid or missing required fields.
             content:
@@ -3053,7 +3034,7 @@ paths:
       description: Get All Vouchers List
       responses:
         '200':
-          description: A JSON array of user names
+          description: Successful response with Vouchers List.
           content:
             application/json:
               schema:
