@@ -1,10 +1,102 @@
 openapi: 3.0.3
 info:
   title: HellOOpass API documentation
-
+  description: API documentation for HellOOpass platform with JWT authentication
   version: 1.0.11
 servers:
   - url: https://helloomarket.com/api
+    description: Production server
+  - url: http://localhost:5000
+    description: Local development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from the /authenticate endpoint
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Error description"
+    SuccessResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Success message"
+    AuthRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "admin"
+        password:
+          type: string
+          example: "admin123"
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3RhdHVzIjoidmFsaWQiLCJpYXQiOjE2MTYyMzkwMjJ9.1q2w3e4r5t6y7u8i9o0p"
+security:
+- bearerAuth: []
+tags:
+  - name: Authentication
+    description: Endpoints for user authentication
+  - name: Dube International
+    description: Merchant and customer management
+  - name: WFP
+    description: World Food Programme related operations
+
+paths:
+  /authenticate:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: Returns a JWT token for authenticated users
+      operationId: authenticateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      # Remove security for authentication endpoint
+      security: []
 tags:
   - name: Dube International
     description: ""

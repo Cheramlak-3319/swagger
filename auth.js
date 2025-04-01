@@ -1,38 +1,65 @@
-// requires 
-const SECRET ="This is my token logic";
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const SECRET = 'your-secret-key';
+
 const users = [
-    {username:'admin', password: 'admin'},
-    {username:'user', password: 'user'},
-    {username:'guest', password: 'guest'},
-    // more users...
-]
-const _this = module.exports = {
-    authenticate: async (username, password) => {
-        try {
-            const user = users.find(u => u.username === username && u.password === password);
-            if(!user) throw new Error('Invalid username or password');
-            token = await jwt.sign({username:username, status: 'valid'}, SECRET);
-            // token = await Buffer.from([SECRET,username,password].join(':')).toString('base64');
-            console.log(token);
-            return token
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
-    },
-    verifyToken: async (token) => {
-        try {
-            // decoded = await Buffer.from(token, 'base64').toString('utf8');
-            // [secret, username, password] = decoded.split(':');
-            // console.log(username, password);
-            // console.log(decoded);
-            // return jwt.verify(token, SECRET);
-            return jwt.verify(token, SECRET);
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
+  { id: 1, username: 'admin', password: 'admin', role: 'admin' },
+  { id: 2, username: 'user', password: 'user', role: 'user' }
+];
+
+module.exports = {
+  authenticate: (req, res) => {
+    // Add validation for request body
+    if (!req.body || !req.body.username || !req.body.password) {
+      return res.status(400).json({ 
+        error: true, 
+        message: 'Username and password are required' 
+      });
     }
 
-}
+    const { username, password } = req.body;
+    
+    // Find user - now using the actual input values
+    const user = users.find(u => 
+      u.username === username && 
+      u.password === password
+    );
+    
+    if (!user) {
+      return res.status(401).json({ 
+        error: true, 
+        message: 'Invalid username or password' 
+      });
+    }
+    
+    const token = jwt.sign(
+      { userId: user.id, username: user.username, role: user.role },
+      SECRET,
+      { expiresIn: '1h' }
+    );
+    
+    res.json({ token });
+  },
+  
+  verifyToken: (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ 
+        error: true, 
+        message: 'Authorization token is required' 
+      });
+    }
+    
+    jwt.verify(token, SECRET, (err, user) => {
+      if (err) {
+        return res.status(403).json({ 
+          error: true, 
+          message: 'Invalid or expired token' 
+        });
+      }
+      req.user = user;
+      next();
+    });
+  }
+};
