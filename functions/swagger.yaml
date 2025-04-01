@@ -96,13 +96,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       # Remove security for authentication endpoint
-      security: []
-tags:
-  - name: Dube International
-    description: ""
-  - name: WFP
-    description: ''
-paths:
+      security: []      
   /dube/international/getmerchantlist.php:
     get:
       tags:
