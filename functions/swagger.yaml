@@ -63,6 +63,55 @@ tags:
     description: World Food Programme related operations
 
 paths:
+  /api/protected:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Authentication
+      summary: Protected endpoint
+      description: This endpoint is protected and requires a valid JWT token.
+      operationId: getProtectedData
+      responses:
+        '200':
+          description: Protected data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "This is protected data."
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/login:
+    post:
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string, example: "admin" }
+                password: { type: string, example: "admin" }
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: 
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   /authenticate:
     post:
       tags:
