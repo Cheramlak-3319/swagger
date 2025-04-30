@@ -1,96 +1,60 @@
 const express = require('express');
+const User = require('../model/db.model.js')
+const dbConnect = require('../config/db.connect.js')
+const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const path = require('path');
-const serverless = require('serverless-http');
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-const auth = require('../auth');
-const { console } = require('inspector');
-const app = express();
-
-// Middleware setup
+const swaggerUi =require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
+const {generateToken} = require('../auth.js')
+const mongoose = require('mongoose');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-const PORT = process.env.PORT || 5000;
-const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
+const PORT = 5000;
 
-// Updated Swagger auth middleware
-const swaggerAuthMiddleware = (req, res, next) => {
-  // Allow Swagger UI assets and login endpoint
-  if (req.path.includes('/api-docs') || req.path === '/login') {
-    return next();
-  }
+app.post('/create',async(req,res,next)=>{
+  const {name,Project,password} = req.body;
+  try {
+    const findUser = await User.findOne({name})
 
-  // Check for existing token
-  const token = req.cookies?.token || 
-               req.headers.authorization?.split(' ')[1];
 
-  if (!token) {
-    if (req.accepts('html')) {
-      // Serve login form
-      return res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>API Login</title>
-          <style>
-            body { font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
-            form { display: flex; flex-direction: column; gap: 10px; }
-            input, button { padding: 8px; font-size: 16px; }
-            button { background: #0066cc; color: white; border: none; cursor: pointer; }
-          </style>
-        </head>
-        <body>
-          <h1>API Documentation Login</h1>
-          <form action="/login" method="POST" onsubmit="event.submitter.disabled=true">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-          </form>
-          ${req.query.error ? `<p style="color:red">${req.query.error}</p>` : ''}
-        </body>
-        </html>
-      `);
+    if(findUser){
+      res.status.json({
+        message: "user already exist"
+      })
     }
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
 
-  // Verify token
-  jwt.verify(token, SECRET, (err, decoded) => {
-    if (err) {
-      if (req.accepts('html')) {
-        return res.redirect('/?error=Invalid+or+expired+token');
-      }
-      return res.status(403).json({ error: 'Invalid token' });
-    }
+    const newUser = await User.create({
+      name:name,
+      password:password,
+      Project:Project
+    })
+
+    res.json({
+      User: newUser
+    })
+  } catch (error) {
     
-    req.user = decoded;
-    next();
-  });
-};
+  }
+})
 
 // Updated login route
-app.post('/login', (req, res) => {
+app.post('/login', async(req, res,next) => {
   try {
-    const { username, password } = req.body;
-    const token = auth.authenticate(username, password);
-    
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 3600000
-    });
+    const { name, password, Project} = req.body;
+    const findUser = await User.findOne({name});
+    const token = await generateToken(name, Project, password);
 
-    // Redirect to protected content after login
-    if (req.accepts('html')) {
-      return res.redirect('/api/api-docs');
-    }
-    
-    res.json({ success: true, token });
+    res.cookie('token', token,{
+      httpOnly: true
+    })
+
+    res.json({
+      findUser:findUser,
+      token: token
+    })
   } catch (err) {
     if (req.accepts('html')) {
       return res.redirect(`/?error=${encodeURIComponent(err.message)}`);
@@ -102,36 +66,35 @@ app.post('/login', (req, res) => {
   }
 });
 
-// Protected route with HTML response option
-app.get('/protected', auth.verifyToken, (req, res) => {
-  if (req.accepts('html')) {
-    return res.send(`
-      <h1>Protected Content</h1>
-      <p>Welcome ${req.user.username}!</p>
-      <a href="/api/api-docs">View API Documentation</a>
-    `);
-  }
-  
-  res.json({
-    success: true,
-    user: req.user7
-  });
-});
-// Apply Swagger auth middleware
-app.use(swaggerAuthMiddleware);
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Swagger UI routes
-app.use('/.netlify/functions/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: "HellOOpass API documentation",
+      description: "API documentation for HellOOpass platform with JWT authentication",
+      version: "1.0.11",
+    },
+    servers: [
+      {
+        url: "https://helloomarket.com/api",
+        description: "Production server",
+      },
+      {
+        url: "http://localhost:5000",
+        description: "Local development server",
+      }
+    ],
+  },
+  apis: ['./route/*.js'],
+};
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: true, message: 'Something went wrong!' });
-});
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: true }));
+
+
+dbConnect();
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

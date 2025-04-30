@@ -1523,9 +1523,6 @@ paths:
                         totalNumberOfMerchants: 
                           type: string
                           example: "2796"
-                        totalNumberOfSuppliers: 
-                          type: string
-                          example: "1559"
                         totalNumberOfCustomers: 
                           type: string
                           example: "77059"
