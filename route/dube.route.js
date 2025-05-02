@@ -696,10 +696,6 @@ dubeRoute.get('/international/getrepaymenthistory.php', getRepaymentHistory);
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
  
@@ -749,10 +745,6 @@ dubeRoute.get('/international/gettopuphistory.php', getTopupHistory);
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 dubeRoute.get('/international/getprojectlist.php', getProjectList);
@@ -806,10 +798,6 @@ dubeRoute.get('/international/getprojectlist.php', getProjectList);
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 dubeRoute.get('/international/getsupplierlist.php', getSupplierList);
@@ -860,10 +848,6 @@ dubeRoute.get('/international/getsupplierlist.php', getSupplierList);
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 
@@ -931,10 +915,6 @@ dubeRoute.get('/international/getreceipt.php', getReceipt);
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 dubeRoute.get('/international/getopeninvoices.php', getOpenInvoices);
@@ -1001,10 +981,6 @@ dubeRoute.get('/international/getopeninvoices.php', getOpenInvoices);
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 dubeRoute.get('/international/getallinvoices.php', getAllInvoices);
@@ -1034,10 +1010,6 @@ dubeRoute.get('/international/getallinternationalinvoices.php', getAllInternatio
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 
@@ -1065,10 +1037,6 @@ dubeRoute.get('/international/getinternationaltotals.php', getInternationalTotal
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 dubeRoute.get('/international/getcashinandcashout.php', getCashInandCashOut);
@@ -1130,10 +1098,6 @@ dubeRoute.get('/international/getcashinandcashout.php', getCashInandCashOut);
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error. An unexpected error occurred on the server.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 
@@ -1163,10 +1127,6 @@ dubeRoute.get('/international/getrepaymenthistorylist.php', getRepaymentHistoryL
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 
@@ -1195,10 +1155,6 @@ dubeRoute.get('/international/getinvicesandrepayments.php', getInvicesandRepayme
  *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error. An unexpected error occurred on the server.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 
