@@ -1,219 +1,292 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
-  title: HellOOpass API documentation
-  description: API documentation for HellOOpass platform with JWT authentication
+  title: HellOOpass Platform API
+  description: |
+    # 🔥 HellOOpass Enterprise API v1.0
+
+    ## 📋 Overview
+    **HellOOpass** is a comprehensive digital payment and merchant management platform supporting financial inclusion across Africa. This API provides programmatic access to merchant management, customer operations, invoice processing, and WFP (World Food Programme) integration capabilities.
+
+    ### ✨ Key Features
+    - **Merchant & Customer Management** - Full lifecycle management of merchants and customers
+    - **Payment Processing** - Invoice creation, BNPL (Buy Now Pay Later), and repayment tracking
+    - **WFP Integration** - Specialized endpoints for World Food Programme operations
+    - **Real-time Reporting** - Comprehensive financial and operational analytics
+    - **Multi-country Support** - Ethiopia (ET), Kenya (KE), Senegal (SN), Guinea-Bissau (GW)
+
+    ### 🚀 Quick Start
+    1. **Get Authentication Token**
+    ```bash
+    curl -X POST https://api.helloomarket.com/v1/auth/login \
+      -H "Content-Type: application/json" \
+      -d '{"username":"your_username","password":"your_password"}'
+    ```
+
+    2. **Make Your First API Call**
+    ```bash
+    curl -X GET https://api.helloomarket.com/v1/merchants \
+      -H "Authorization: Bearer YOUR_TOKEN" \
+      -H "X-API-Key: YOUR_API_KEY"
+    ```
+
+    ---
+    *Documentation last updated: 2024-01-22*
+
   version: 1.0.11
+  termsOfService: https://helloomarket.com/legal/api-terms
+  contact:
+    name: HellOOpass API Team
+    email: api@helloomarket.com
+    url: https://helloomarket.com/support/api
+  license:
+    name: HellOOpass Proprietary License
+    url: https://helloomarket.com/legal/license
+
 servers:
-  - url: https://helloomarket.com/api
-    description: Production server
-  - url: http://localhost:5000
-    description: Local development server
+  - url: https://api.helloomarket.com/v1
+    description: Production Environment
+  - url: https://staging-api.helloomarket.com/v1
+    description: Staging Environment
+  - url: http://localhost:4000
+    description: Local Development
+
+tags:
+  - name: Authentication
+    description: User authentication and token management
+  - name: Merchants
+    description: Merchant account management and operations
+  - name: Customers
+    description: Customer management and transactions
+  - name: Invoices
+    description: Invoice creation, retrieval, and management
+  - name: Payments
+    description: Payment processing and history
+  - name: Suppliers
+    description: Supplier registration and product management
+  - name: Projects
+    description: Project configuration and management
+  - name: WFP Operations
+    description: World Food Programme specific operations
+  - name: Reports
+    description: Financial and operational reporting
+  - name: Wallets
+    description: Wallet operations and transaction history
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT token obtained from the /authenticate endpoint
-  schemas:
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Error description"
-    SuccessResponse:
-      type: object
-      properties:
-        error:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: "Success message"
-    AuthRequest:
-      type: object
-      required:
-        - username
-        - password
-      properties:
-        username:
-          type: string
-          example: "admin"
-        password:
-          type: string
-          example: "admin123"
-    AuthResponse:
-      type: object
-      properties:
-        token:
-          type: string
-          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3RhdHVzIjoidmFsaWQiLCJpYXQiOjE2MTYyMzkwMjJ9.1q2w3e4r5t6y7u8i9o0p"
-security:
-- bearerAuth: []
-tags:
-  - name: Authentication
-    description: Endpoints for user authentication
-  - name: Dube International
-    description: Merchant and customer management
-  - name: WFP
-    description: World Food Programme related operations
+      description: JWT token obtained from /login endpoint
+
+  parameters:
+    PaginationLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 50
+        example: 50
+      description: Number of items to return per page
+
+    PaginationPage:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+      description: Page number for pagination
+
+    CountryCode:
+      name: countryCode
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [ET, KE, SN, GW]
+        default: ET
+        example: ET
+      description: ISO 3166-1 alpha-2 country code
+
+    MobileNumber:
+      name: mobile
+      in: query
+      required: false
+      schema:
+        type: string
+        pattern: '^\+[1-9]\d{1,14}$'
+        example: "+251912345678"
+      description: Mobile number in E.164 format
+
+    DateRangeStart:
+      name: start
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2024-01-01"
+      description: Start date for filtering
+
+    DateRangeEnd:
+      name: end
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2024-12-31"
+      description: End date for filtering
+
+    ActiveStatus:
+      name: active
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: ["0", "1"]
+        default: "1"
+        example: "1"
+      description: Filter by active status
+
+  responses:
+    BadRequest400:
+      description: Bad request - Invalid parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: "Invalid or missing parameters"
+
+    Unauthorized401:
+      description: Unauthorized - Invalid authentication
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: "Authentication required or invalid token"
+
+    InternalServerError500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: "An internal server error occurred"
 
 paths:
-  /api/protected:
-    get:
-      security:
-        - bearerAuth: []
-      tags:
-        - Authentication
-      summary: Protected endpoint
-      description: This endpoint is protected and requires a valid JWT token.
-      operationId: getProtectedData
-      responses:
-        '200':
-          description: Protected data retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "This is protected data."
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/login:
+  # ========================
+  # 🔐 AUTHENTICATION
+  # ========================
+  /login:
     post:
       tags: [Authentication]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username: { type: string, example: "admin" }
-                password: { type: string, example: "admin" }
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token: 
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  /authenticate:
-    post:
-      tags:
-        - Authentication
-      summary: Authenticate user
-      description: Returns a JWT token for authenticated users
+      summary: User Authentication
+      description: Authenticate user and obtain JWT token for API access
       operationId: authenticateUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthRequest'
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: "admin@helloomarket.com"
+                password:
+                  type: string
+                  format: password
+                  example: "SecurePass123!"
       responses:
-        '200':
+        "200":
           description: Authentication successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      # Remove security for authentication endpoint
-      security: []      
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  message:
+                    type: string
+                    example: "Authentication successful"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+      security: []
+
+  # ========================
+  # 🏪 MERCHANTS
+  # ========================
   /dube/international/getmerchantlist.php:
     get:
-      tags:
-        - Dube International
+      tags: [Merchants]
       summary: Get Merchant List
-      description: Retrieves a list of merchants.
+      description: Retrieves a paginated list of merchants with filtering capabilities
+      operationId: getMerchantList
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: Page
-        description: Page number for pagination
-        required: false
-        schema: 
-          type: integer
-          format: int32
-          example: 1
-      - in: query
-        name: userId
-        description: |
-          Unique identifier for the user with in 6 digits
-          - Examples: `123456`, `123457`, `123458`
-        required: false
-        schema:
-         type: integer
-         format: int32
-      -  in: query
-         name: mobile
-         description: |
-           The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
-         required: false
-         schema:
-           type: string
-      - in: query
-        name: project
-        description: Project name, replaced with 'Palladium' if it contains 'Standard'
-        required: false
-        schema:
-          type: string
-          example: "Palladium"	
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
-      - in: query
-        name: active
-        description: Whether the merchant is active or not
-        required: false
-        schema:
-          type: string
-          enum: ["1", "0"]
-          example: "1"
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: Page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: userId
+          in: query
+          description: Unique 6-digit user identifier
+          required: false
+          schema:
+            type: integer
+            example: 123456
+        - $ref: "#/components/parameters/MobileNumber"
+        - name: project
+          in: query
+          description: Project name filter
+          required: false
+          schema:
+            type: string
+            example: "Palladium"
+        - $ref: "#/components/parameters/CountryCode"
+        - $ref: "#/components/parameters/ActiveStatus"
       responses:
-        '200':
-          description:  List of merchants retrieved successfully
+        "200":
+          description: Merchant list retrieved successfully
           content:
             application/json:
               schema:
@@ -230,15 +303,15 @@ paths:
                     items:
                       type: object
                       properties:
-                        userid: 
+                        userid:
                           type: string
                           example: "123456"
-                        fullname: 
+                        fullname:
                           type: string
-                          example: "hello shop"
+                          example: "Hello Shop"
                         businessName:
                           type: string
-                          example: "hello shop"
+                          example: "Hello Shop"
                         mobile:
                           type: string
                           example: "251912345678"
@@ -273,97 +346,45 @@ paths:
                                 example: "1234567890"
                               wallettype:
                                 type: string
-                                example: "MERCHANT_AVILABLE"
+                                example: "MERCHANT_AVAILABLE"
                               balance:
                                 type: string
                                 example: "2000000"
                               bnpl:
                                 type: string
                                 example: "2000000"
-                          example:
-                          - name: "0.00"
-                            wallettype: "MERCHANT_CREDIT"
-                            balance: "2000000"
-                            bnpl: "0.00"
-                          - name: "1451013738"
-                            wallettype: "MERCHANT_EARNING"
-                            balance: "0.00"
-                            bnpl: "0.00"
-                          - name: "4197613738"
-                            wallettype: "MERCHANT_AVAILABLE"
-                            balance: "0.00"
-                            bnpl: "0.00"
-                        foodCategory: 
+                        foodCategory:
                           type: string
                           example: "desert"
-
         "400":
-          description: Bad request. The provided data is invalid or missing required fields.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "No content passed."
-
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/international/getcustomerlist.php:
     get:
-      tags:
-        - Dube International
+      tags: [Customers]
       summary: Get Customer List
-      description: Retrieves a list of customers.
+      description: Retrieves a paginated list of customers
+      operationId: getCustomerList
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-      - in: query
-        name: Page
-        description: Page number for pagination
-        required: false
-        schema: 
-          type: integer
-          format: int32
-      -  in: query
-         name: mobile
-         description: |
-           The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
-         required: false
-         schema:
-           type: string
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: Page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - $ref: "#/components/parameters/MobileNumber"
+        - $ref: "#/components/parameters/CountryCode"
       responses:
-        '200':
-          description: List of customers retrieved successfully
+        "200":
+          description: Customer list retrieved successfully
           content:
             application/json:
               schema:
@@ -380,10 +401,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        userid: 
+                        userid:
                           type: string
                           example: "123456"
-                        fullname: 
+                        fullname:
                           type: string
                           example: "hello shop"
                         mobile:
@@ -392,10 +413,10 @@ paths:
                         creditwallet:
                           type: string
                           example: "1234567890"
-                        purchasewallet: 
+                        purchasewallet:
                           type: string
                           example: "1234567890"
-                        purchasebalance: 
+                        purchasebalance:
                           type: string
                           example: "0.00"
                         createdon:
@@ -407,7 +428,7 @@ paths:
                         merchantName:
                           type: string
                           example: "hello shop"
-                        merchantUserId: 
+                        merchantUserId:
                           type: string
                           example: "123456"
                         active:
@@ -418,96 +439,51 @@ paths:
                           example: "0.00"
                         otheCreditLines:
                           type: array
-                          description: List of other credit lines (if any)
-                          items:
-                            type: object
-                            properties: {}
+                          items: {}
                           example: []
                         gifts:
                           type: array
-                          description: List of gifts (if any)
-                          items:
-                            type: object
-                            properties: {}
+                          items: {}
                           example: []
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 📄 INVOICES & PAYMENTS
+  # ========================
   /dube/international/getallinvoices.php:
     get:
-      tags:
-        - Dube International
+      tags: [Invoices]
       summary: Get All Invoices
-      description:  Retrieves a list of all invoices.
+      description: Retrieves a paginated list of all invoices with filtering
+      operationId: getAllInvoices
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: wallet
-        description: |
-          Wallet identifier or type
-          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
-        required: false
-        schema:
-          type: string
-      - in: query
-        name: start
-        description: |
-          Start date or parameter for filtering
-          - Example: `"2024-01-01"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: end
-        description: |
-          End date or parameter for filtering
-          - Example: `"2024-12-31"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: offset
-        description: Pagination offset
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 0    
+        - name: wallet
+          in: query
+          description: Wallet identifier filter
+          required: false
+          schema:
+            type: string
+            example: "1234567890"
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            example: 0
       responses:
-        '200':
-          description: List of invoices retrieved successfully
+        "200":
+          description: Invoices retrieved successfully
           content:
             application/json:
               schema:
@@ -524,10 +500,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionId: 
+                        transactionId:
                           type: string
                           example: "WFPWP1234567890123"
-                        merchantName: 
+                        merchantName:
                           type: string
                           example: "Hello Shop"
                         merchantUserId:
@@ -536,10 +512,10 @@ paths:
                         merchantMobile:
                           type: string
                           example: "251912345678"
-                        customerName: 
+                        customerName:
                           type: string
                           example: "Hello Market"
-                        customerMobile: 
+                        customerMobile:
                           type: string
                           example: "251987654332"
                         amount:
@@ -556,85 +532,43 @@ paths:
                           example: "2027-02-13 08:10:50"
                         overdue:
                           type: boolean
-                          example: true|false
+                          example: true
                         repayed:
                           type: string
                           example: "0"
                         repayment:
                           type: array
-                          description: List of gifts (if any)
-                          items:
-                            type: object
-                            properties: {}
+                          items: {}
                           example: []
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/international/getrepaymenthistorylist.php:
     get:
-      tags:
-        - Dube International
-      summary: Get Repayment History list
-      description: Retrive an existing Repayment History list
+      tags: [Payments]
+      summary: Get Repayment History
+      description: Retrieves repayment history with filtering
+      operationId: getRepaymentHistory
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: Page
-        description: Page number for pagination
-        required: false
-        schema: 
-          type: integer
-          format: int32
-          example: 1
-      -  in: query
-         name: mobile
-         description: |
-           The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
-         required: false
-         schema:
-           type: string
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: Page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - $ref: "#/components/parameters/MobileNumber"
+        - $ref: "#/components/parameters/CountryCode"
       responses:
-        '200':
-          description: List of Repayment History successfully 
+        "200":
+          description: Repayment history retrieved successfully
           content:
             application/json:
               schema:
@@ -651,10 +585,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionList: 
+                        transactionList:
                           type: string
                           example: "DW12345678AbC1234"
-                        transactionID: 
+                        transactionID:
                           type: string
                           example: "DWCRAbCdRA00000"
                         paidFrom:
@@ -694,85 +628,45 @@ paths:
                                 example: 10
                               transactionDate:
                                 type: string
-                                format: date-time
                                 example: "2024-11-15 14:46:27"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 💰 WALLETS & TRANSACTIONS
+  # ========================
   /dube/gettopuphistory.php:
     get:
-      tags:
-        - Dube International
+      tags: [Wallets]
       summary: Get Top-Up History
-      description: Retrieves top-up transaction history.
+      description: Retrieves wallet top-up transaction history
+      operationId: getTopUpHistory
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: wallet
-        description: |
-          Wallet identifier or type
-          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
-        required: false
-        schema:
-          type: string
-      - in: query
-        name: start
-        description: |
-          Start date or parameter for filtering
-          - Example: `"2024-01-01"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: end
-        description: |
-          End date or parameter for filtering
-          - Example: `"2024-12-31"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: offset
-        description: Pagination offset
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 0    
+        - name: wallet
+          in: query
+          description: Wallet identifier filter
+          required: false
+          schema:
+            type: string
+            example: "1234567890"
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            example: 0
       responses:
-        '200':
+        "200":
           description: Top-up history retrieved successfully
           content:
             application/json:
@@ -781,15 +675,16 @@ paths:
                 properties:
                   error:
                     type: boolean
+                    example: false
                   message:
                     type: array
                     items:
                       type: object
                       properties:
-                        name: 
+                        name:
                           type: string
                           example: "nana Market"
-                        mobile: 
+                        mobile:
                           type: string
                           example: "251900000000"
                         walletType:
@@ -885,67 +780,37 @@ paths:
                             system:
                               type: string
                               example: "Bank of Abyssinia"
-
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 🏗️ PROJECTS & SUPPLIERS
+  # ========================
   /dube/international/getprojectlist.php:
     get:
-      tags:
-        - Dube International
+      tags: [Projects]
       summary: Get Project List
-      description: Get an existing Project List
+      description: Retrieves list of all projects
+      operationId: getProjectList
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: Page
-        description: Page number for pagination
-        required: false
-        schema: 
-          type: integer
-          format: int32
-          example: 1
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: Page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - $ref: "#/components/parameters/CountryCode"
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Project list retrieved successfully
           content:
             application/json:
               schema:
@@ -962,10 +827,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        projectName: 
+                        projectName:
                           type: string
                           example: "Standard_ET"
-                        countryCode: 
+                        countryCode:
                           type: string
                           example: "ET"
                         countryName:
@@ -974,83 +839,44 @@ paths:
                         creditDisbursementWallet:
                           type: string
                           example: "1234567890"
-                        earningWallet: 
+                        earningWallet:
                           type: string
                           example: "0987654321"
-                        settlementBank: 
+                        settlementBank:
                           type: string
                           example: ""
                         settlementAccount:
                           type: string
                           example: ""
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/international/getsupplierlist.php:
     get:
-      tags:
-        - Dube International
+      tags: [Suppliers]
       summary: Get Supplier List
-      description: Get an existing Supplier List
+      description: Retrieves paginated list of suppliers
+      operationId: getSupplierList
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      -  in: query
-         name: mobile
-         description: |
-           The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
-         required: false
-         schema:
-           type: string
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
-      - in: query
-        name: offset
-        description: Pagination offset
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 0
+        - $ref: "#/components/parameters/PaginationLimit"
+        - $ref: "#/components/parameters/MobileNumber"
+        - $ref: "#/components/parameters/CountryCode"
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            example: 0
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Supplier list retrieved successfully
           content:
             application/json:
               schema:
@@ -1067,10 +893,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        name: 
+                        name:
                           type: string
                           example: "hello shop"
-                        wallet: 
+                        wallet:
                           type: string
                           example: "2244972362"
                         walletBalance:
@@ -1079,75 +905,46 @@ paths:
                         pendingWalletBalance:
                           type: string
                           example: "0.00"
-                        mobile: 
+                        mobile:
                           type: string
                           example: "251991152362"
-                        userId: 
+                        userId:
                           type: string
                           example: "123456"
                         status:
                           type: string
                           example: "1"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 📄 RECEIPTS & DOCUMENTS
+  # ========================
   /dube/international/getreceiptlist.php:
     get:
-      tags:
-        - Dube International
-      summary: Get Receipt list
-      description: Get an existing All Receipt list
+      tags: [Invoices]
+      summary: Get Receipt List
+      description: Retrieves list of all receipts
+      operationId: getReceiptList
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
-      - in: query
-        name: page
-        description: Page number for pagination
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 1
+        - $ref: "#/components/parameters/PaginationLimit"
+        - $ref: "#/components/parameters/CountryCode"
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            example: 1
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Receipt list retrieved successfully
           content:
             application/json:
               schema:
@@ -1164,10 +961,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        id: 
+                        id:
                           type: string
                           example: "7Gq5Xaje-XGMQ-CjaX-ZoDI-cmQnUR4My4bs"
-                        idList: 
+                        idList:
                           type: string
                           example: "rL4Li0MV-RRl0-plEV-q7kB-NOXzKLcgz39j"
                         receiptFilename:
@@ -1175,14 +972,13 @@ paths:
                           example: "https://helloomarket.com/api/dube/international/receipts/7_1738584765-1000028726.jpg"
                         uploadedOn:
                           type: string
-                          format: date-time
                           example: "2025-02-03 12:12:45"
-                        order: 
+                        order:
                           type: array
                           items:
                             type: object
                             properties:
-                              earningWallet: 
+                              earningWallet:
                                 type: string
                                 example: "7354340745"
                               productId:
@@ -1202,82 +998,45 @@ paths:
                                 example: "si0993442"
                               order_date:
                                 type: string
-                                format: date-time
                                 example: "2024-12-30"
                               hellooMarketOrderId:
                                 type: string
                                 example: "20232"
                         status:
-                              type: string
-                              example: "RECEIVED"
+                          type: string
+                          example: "RECEIVED"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 👥 CUSTOMERS
+  # ========================
   /dube/getallcustomers.php:
     get:
-      tags:
-        - Dube International
+      tags: [Customers]
       summary: Get All Customers
-      description: Get an existing All Receipt list
+      description: Retrieves comprehensive customer list
+      operationId: getAllCustomers
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: Page
-        description: Page number for pagination
-        required: false
-        schema: 
-          type: integer
-          format: int32
-          example: 1
-      -  in: query
-         name: mobile
-         description: |
-           The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251******` for Ethiopia, `+254******` for Kenya, `+221******` for Senegal).
-         required: false
-         schema:
-           type: string
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: Page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - $ref: "#/components/parameters/MobileNumber"
+        - $ref: "#/components/parameters/CountryCode"
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Customer list retrieved successfully
           content:
             application/json:
               schema:
@@ -1294,10 +1053,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        userid: 
+                        userid:
                           type: string
                           example: "123456"
-                        fullname: 
+                        fullname:
                           type: string
                           example: "hello shop"
                         mobile:
@@ -1309,10 +1068,10 @@ paths:
                         creditbalance:
                           type: string
                           example: "0.00"
-                        purchasewallet: 
+                        purchasewallet:
                           type: string
                           example: "1234567890"
-                        purchasebalance: 
+                        purchasebalance:
                           type: string
                           example: "0.00"
                         createdon:
@@ -1321,12 +1080,12 @@ paths:
                         active:
                           type: string
                           example: "1"
-                        gifts: 
+                        gifts:
                           type: array
                           items:
                             type: object
                             properties:
-                              giftWallet: 
+                              giftWallet:
                                 type: string
                                 example: "4669016915"
                               giftedBy:
@@ -1348,83 +1107,41 @@ paths:
                                 type: string
                                 example: "255710101010"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getopeninvoices.php:
     get:
-      tags:
-        - Dube International
-      summary: Get All Open Invoices
-      description: Retrive an existing All Open Invoices list
+      tags: [Invoices]
+      summary: Get Open Invoices
+      description: Retrieves list of all open invoices
+      operationId: getOpenInvoices
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: wallet
-        description: |
-          Wallet identifier or type
-          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
-        required: false
-        schema:
-          type: string
-      - in: query
-        name: start
-        description: |
-          Start date or parameter for filtering
-          - Example: `"2024-01-01"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: end
-        description: |
-          End date or parameter for filtering
-          - Example: `"2024-12-31"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 10
-      - in: query
-        name: offset
-        description: Pagination offset
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 0  
+        - name: wallet
+          in: query
+          description: Wallet identifier filter
+          required: false
+          schema:
+            type: string
+            example: "1234567890"
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            example: 0
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Open invoices retrieved successfully
           content:
             application/json:
               schema:
@@ -1441,12 +1158,12 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionID: 
+                        transactionID:
                           type: string
                           example: "DW12345678AbC1234"
-                        amount: 
+                        amount:
                           type: string
-                          example: 10
+                          example: "10"
                         customerCreditWallet:
                           type: string
                           example: "9733770001"
@@ -1458,49 +1175,37 @@ paths:
                           example: "251900000000"
                         transactionDate:
                           type: string
-                          format: date-time
                           example: "2024-11-15 14:46:27"
                         dueDate:
                           type: string
                           example: "2024-11-15 14:46:27"
                         overdue:
                           type: boolean
-                          example: true|false
+                          example: true
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 📊 REPORTS & ANALYTICS
+  # ========================
   /dube/international/gettotals.php:
     get:
-      tags:
-        - Dube International
-      summary: Get All Users
-      description: Get an existing All Users
+      tags: [Reports]
+      summary: Get System Totals
+      description: Retrieves comprehensive system statistics
+      operationId: getSystemTotals
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: System totals retrieved successfully
           content:
             application/json:
               schema:
@@ -1514,156 +1219,117 @@ paths:
                     items:
                       type: object
                       properties:
-                        numberOfActiveMerchants: 
+                        numberOfActiveMerchants:
                           type: string
                           example: "2082"
-                        numberOfActiveCustomers: 
+                        numberOfActiveCustomers:
                           type: number
                           example: 77056
-                        totalNumberOfMerchants: 
+                        totalNumberOfMerchants:
                           type: string
                           example: "2796"
-                        totalNumberOfCustomers: 
+                        totalNumberOfSuppliers:
+                          type: string
+                          example: "1559"
+                        totalNumberOfCustomers:
                           type: string
                           example: "77059"
-                        totalNumberOfMerchantsWithActivePINs: 
+                        totalNumberOfMerchantsWithActivePINs:
                           type: string
                           example: "635"
-                        totalNumberOfCustomersWithActivePINs: 
+                        totalNumberOfCustomersWithActivePINs:
                           type: string
                           example: "36307"
-                        totalNumberOfLoggedInMerchants: 
+                        totalNumberOfLoggedInMerchants:
                           type: string
                           example: "537"
-                        totalNumberOfLoggedInCustomers: 
+                        totalNumberOfLoggedInCustomers:
                           type: string
                           example: "137"
-                        totalInvoiceAmount: 
+                        totalInvoiceAmount:
                           type: number
                           example: 69255702.57
-                        totalNumberOfInvoices: 
+                        totalNumberOfInvoices:
                           type: string
                           example: "234669"
-                        totalCashInAmount: 
+                        totalCashInAmount:
                           type: string
                           example: "255763017067.2603"
-                        totalNumberOfCashIns: 
+                        totalNumberOfCashIns:
                           type: string
                           example: "363"
-                        totalCashoutAmount: 
+                        totalCashoutAmount:
                           type: string
                           example: "36307"
-                        totalNumberOfCashouts: 
+                        totalNumberOfCashouts:
                           type: string
                           example: "7590"
-                        totalCreditAmount: 
+                        totalCreditAmount:
                           type: string
                           example: "4661786"
-                        totalNumberOfCredit: 
+                        totalNumberOfCredit:
                           type: string
                           example: "914"
-                        totalRepayedAmount: 
+                        totalRepayedAmount:
                           type: string
                           example: "296556.1291"
-                        totalNumberOfRepayment: 
+                        totalNumberOfRepayment:
                           type: string
                           example: "895"
-                        totalUnpaidInvoicesAmount: 
+                        totalUnpaidInvoicesAmount:
                           type: string
                           example: "174157.80000000005"
-                        totalNumberOfUnpaidInvoices: 
+                        totalNumberOfUnpaidInvoices:
                           type: string
                           example: "247"
-                        totalOverdueInvoicesAmount: 
+                        totalOverdueInvoicesAmount:
                           type: string
                           example: "172935.15000000002"
-                        totalNumberOfOverdueInvoices: 
+                        totalNumberOfOverdueInvoices:
                           type: string
                           example: "241"
-                        totalTransfersCount: 
+                        totalTransfersCount:
                           type: string
                           example: "732"
-                        totalNumberOfTransfers: 
+                        totalNumberOfTransfers:
                           type: string
                           example: "4165736.7399999998"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getallinvoices.php:
     get:
-      tags:
-        - Dube International
-      summary: Get All Invoices
-      description: Get an existing All Invoices
+      tags: [Invoices]
+      summary: Get All Invoices (Alternative)
+      description: Alternative endpoint for invoice retrieval
+      operationId: getAllInvoicesAlt
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: wallet
-        description: |
-          Wallet identifier or type
-          - Example: `"1234567890"` for a specific wallet, or lefting empty for for all wallets.
-        required: false
-        schema:
-          type: string
-      - in: query
-        name: start
-        description: |
-          Start date or parameter for filtering
-          - Example: `"2024-01-01"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: end
-        description: |
-          End date or parameter for filtering
-          - Example: `"2024-12-31"`
-        required: false
-        schema:
-          type: string
-          format: date-time
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 100
-      - in: query
-        name: offset
-        description: Pagination offset
-        required: false
-        schema:
-          type: integer
-          format: int32
-          example: 0    
+        - name: wallet
+          in: query
+          description: Wallet identifier filter
+          required: false
+          schema:
+            type: string
+            example: "1234567890"
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            example: 0
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Invoices retrieved successfully
           content:
             application/json:
               schema:
@@ -1680,10 +1346,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionId: 
+                        transactionId:
                           type: string
                           example: "WFPWP1234567890123"
-                        merchantName: 
+                        merchantName:
                           type: string
                           example: "Gesese Molla"
                         merchantUserId:
@@ -1692,10 +1358,10 @@ paths:
                         merchantMobile:
                           type: string
                           example: "251938905964"
-                        customerName: 
+                        customerName:
                           type: string
                           example: "Mulushewa Moges"
-                        customerMobile: 
+                        customerMobile:
                           type: string
                           example: "251913663497"
                         amount:
@@ -1718,46 +1384,29 @@ paths:
                           example: "0"
                         repayment:
                           type: array
-                          description: List of gifts (if any)
-                          items:
-                            type: object
-                            properties: {}
+                          items: {}
                           example: []
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/gettotals.php:
     get:
-      tags:
-        - Dube International
-      summary: Get All Users
-      description: Get an existing All Users
+      tags: [Reports]
+      summary: Get Basic Totals
+      description: Retrieves basic system statistics
+      operationId: getBasicTotals
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Basic totals retrieved successfully
           content:
             application/json:
               schema:
@@ -1771,51 +1420,57 @@ paths:
                     items:
                       type: object
                       properties:
-                        numberOfActiveMerchants: 
+                        numberOfActiveMerchants:
                           type: string
                           example: "2082"
-                        numberOfActiveCustomers: 
+                        numberOfActiveCustomers:
                           type: number
                           example: 77056
-                        totalNumberOfMerchants: 
+                        totalNumberOfMerchants:
                           type: string
                           example: "2796"
-                        totalNumberOfCustomers: 
+                        totalNumberOfCustomers:
                           type: string
                           example: "77059"
-                        totalNumberOfMerchantsWithActivePINs: 
+                        totalNumberOfMerchantsWithActivePINs:
                           type: string
                           example: "635"
-                        totalNumberOfCustomersWithActivePINs: 
+                        totalNumberOfCustomersWithActivePINs:
                           type: string
                           example: "36307"
-                        totalNumberOfLoggedInMerchants: 
+                        totalNumberOfLoggedInMerchants:
                           type: string
                           example: "537"
-                        totalNumberOfLoggedInCustomers: 
+                        totalNumberOfLoggedInCustomers:
                           type: string
                           example: "137"
-                        totalInvoiceAmount: 
+                        totalInvoiceAmount:
                           type: number
                           example: 69255702.57
-                        totalNumberOfInvoices: 
+                        totalNumberOfInvoices:
                           type: string
                           example: "234669"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
+          $ref: "#/components/responses/InternalServerError500"
+
+  /dube/international/gettotalsleapfrog.php:
+    get:
+      tags: [Reports]
+      summary: Get Leapfrog Totals
+      description: Retrieves Leapfrog program statistics
+      operationId: getLeapfrogTotals
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+      responses:
+        "200":
+          description: Leapfrog totals retrieved successfully
           content:
             application/json:
               schema:
@@ -1823,19 +1478,70 @@ paths:
                 properties:
                   error:
                     type: boolean
-                    example: true
+                    example: false
                   message:
-                    type: string
-                    example: "An internal server error occurred."
+                    type: object
+                    properties:
+                      numberOfActiveSalesAgents:
+                        type: string
+                        example: "82"
+                      numberOfActiveRetailers:
+                        type: number
+                        example: 77056
+                      totalInvoiceAmount:
+                        type: string
+                        example: "2796"
+                      totalNumberOfInvoices:
+                        type: string
+                        example: "77059"
+                      totalCreditAmountSalesAgents:
+                        type: string
+                        example: "635"
+                      totalNumberOfCreditSalesAgents:
+                        type: string
+                        example: "36307"
+                      totalCreditAmountRetailers:
+                        type: string
+                        example: "537"
+                      totalNumberOfCreditRetailers:
+                        type: string
+                        example: "137"
+                      totalRepayedAmount:
+                        type: number
+                        example: 69255702.57
+                      totalNumberOfRepayment:
+                        type: string
+                        example: "234669"
+                      totalUnpaidInvoicesAmount:
+                        type: string
+                        example: "234669"
+                      totalNumberOfUnpaidInvoices:
+                        type: number
+                        example: 234669
+                      totalOverdueInvoicesAmount:
+                        type: number
+                        example: 234669
+                      totalNumberOfOverdueInvoices:
+                        type: number
+                        example: 234669
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getcashinandouttotals.php:
     get:
-      tags:
-        - Dube International
-      summary: Get All Cashin and Out Totals
-      description: Get an existing All Cashin and Out Totals
+      tags: [Reports]
+      summary: Get Cash In/Out Totals
+      description: Retrieves cash flow statistics
+      operationId: getCashInOutTotals
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Cash in/out totals retrieved successfully
           content:
             application/json:
               schema:
@@ -1849,59 +1555,42 @@ paths:
                     items:
                       type: object
                       properties:
-                        totalCashInAmount: 
+                        totalCashInAmount:
                           type: string
                           example: "255763017067.2603"
-                        totalNumberOfCashIns: 
+                        totalNumberOfCashIns:
                           type: string
                           example: "363"
-                        totalCashoutAmount: 
+                        totalCashoutAmount:
                           type: string
                           example: "36307"
-                        totalNumberOfCashouts: 
+                        totalNumberOfCashouts:
                           type: string
                           example: "7590"
-                        totalCreditAmount: 
+                        totalCreditAmount:
                           type: string
                           example: "4661786"
-                        totalNumberOfCredit: 
+                        totalNumberOfCredit:
                           type: string
                           example: "914"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getinvoicesandrepayments.php:
     get:
-      tags:
-        - Dube International
-      summary: Get All Users
-      description: Get an existing All Users
+      tags: [Reports]
+      summary: Get Invoices and Repayments
+      description: Retrieves invoice and repayment statistics
+      operationId: getInvoicesAndRepayments
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Invoice and repayment data retrieved successfully
           content:
             application/json:
               schema:
@@ -1915,99 +1604,59 @@ paths:
                     items:
                       type: object
                       properties:
-                        totalRepayedAmount: 
+                        totalRepayedAmount:
                           type: string
                           example: "296556.1291"
-                        totalRepayedNumber: 
+                        totalRepayedNumber:
                           type: string
                           example: "895"
-                        totalToBePaidAmount: 
+                        totalToBePaidAmount:
                           type: string
                           example: "174157.80000000005"
-                        totalToBePaidNumber: 
+                        totalToBePaidNumber:
                           type: string
                           example: "247"
-                        totalOverdueAmount: 
+                        totalOverdueAmount:
                           type: string
                           example: "172935.15000000002"
-                        totalOverdueNumber: 
+                        totalOverdueNumber:
                           type: string
                           example: "241"
-                        totalInvoiceAmount: 
+                        totalInvoiceAmount:
                           type: string
                           example: "732"
-                        totalInvoiceNumber: 
+                        totalInvoiceNumber:
                           type: string
                           example: "4165736.7399999998"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getrepaymenthistorylist.php:
     get:
-      tags:
-        - Dube International
-      summary: Get Repayment History list
-      description: Get an existing Repayment History list
+      tags: [Payments]
+      summary: Get Repayment History (Alternative)
+      description: Alternative endpoint for repayment history
+      operationId: getRepaymentHistoryAlt
+      security:
+        - bearerAuth: []
       parameters:
-      - in: query
-        name: limit
-        description: Number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32
-      - in: query
-        name: Page
-        description: Page number for pagination
-        required: false
-        schema: 
-          type: integer
-          format: int32
-      -  in: query
-         name: mobile
-         description: |
-           The **international dial code** used to filter results by country.
-           - Example format: `+XXX` (e.g., `+251` for Ethiopia, `+254` for Kenya, `+245` for Guinea-Bissau).
-         required: false
-         schema:
-           type: string
-           example: "+251"
-      - in: query
-        name: countryCode
-        description: |
-          The **ISO 3166-1 alpha-2** country code used to filter results by country.
-          - Example: `"ET"` for Ethiopia, `"KE"` for Kenya, `"SN"` for Senegal.
-        required: false
-        schema:
-          type: string
-          pattern: "^[A-Z]{2}$"
-          example: "ET"
+        - $ref: "#/components/parameters/PaginationLimit"
+        - name: Page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - $ref: "#/components/parameters/MobileNumber"
+        - $ref: "#/components/parameters/CountryCode"
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Repayment history retrieved successfully
           content:
             application/json:
               schema:
@@ -2024,10 +1673,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionList: 
+                        transactionList:
                           type: string
                           example: "DW74818394Laa0003"
-                        transactionID: 
+                        transactionID:
                           type: string
                           example: "DWCRmVj4F6NR50003"
                         paidFrom:
@@ -2065,54 +1714,27 @@ paths:
                               bnpl:
                                 type: string
                                 example: "2000000"
-                          example:
-                          - name: "1190073738"
-                            wallettype: "MERCHANT_CREDIT"
-                            balance: "2000000"
-                            bnpl: "2000000"
-                          - name: "1451013738"
-                            wallettype: "MERCHANT_AVAILABLE"
-                            balance: "1500000"
-                            bnpl: "1500000"
-                          - name: "4197613738"
-                            wallettype: "MERCHANT_EARNING"
-                            balance: "1500000"
-                            bnpl: "1500000"
-                        foodCategory: 
+                        foodCategory:
                           type: string
                           example: "desert"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 📝 REGISTRATION ENDPOINTS
+  # ========================
   /dube/international/registerproject.php:
     post:
-      tags:
-        - Dube International
-      summary: Register a new Project
-      description: Registers a new project with start and end dates.
+      tags: [Projects]
+      summary: Register New Project
+      description: Register a new project in the system
+      operationId: registerProject
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2141,9 +1763,9 @@ paths:
                 settlementBank:
                   type: string
                   example: "KCB"
-    responses:
-      "201":
-          description: Cycle registered successfully.
+      responses:
+        "201":
+          description: Project registered successfully
           content:
             application/json:
               schema:
@@ -2155,38 +1777,21 @@ paths:
                   message:
                     type: string
                     example: "Category created successfully."
-      "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-      "500":
-        description: Internal server error. An unexpected error occurred on the server.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                error:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: "An internal server error occurred."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/international/registersupplier.php:
     post:
-      tags:
-        - Dube International
-      summary: Register a new Supplier
-      description: Registers a new Supplier with start and end dates.
+      tags: [Suppliers]
+      summary: Register New Supplier
+      description: Register a new supplier in the system
+      operationId: registerSupplier
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2212,9 +1817,9 @@ paths:
                 dialCode:
                   type: string
                   example: "251"
-    responses:
-      "201":
-          description: Cycle registered successfully.
+      responses:
+        "201":
+          description: Supplier registered successfully
           content:
             application/json:
               schema:
@@ -2226,38 +1831,21 @@ paths:
                   message:
                     type: string
                     example: "Category created successfully."
-      "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-      "500":
-        description: Internal server error. An unexpected error occurred on the server.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                error:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: "An internal server error occurred."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/international/registersupplierproduct.php:
     post:
-      tags:
-        - Dube International
-      summary: Register a new Supplier Product
-      description: Registers a new Supplier Product.
+      tags: [Suppliers]
+      summary: Register Supplier Product
+      description: Register a new product for a supplier
+      operationId: registerSupplierProduct
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2312,9 +1900,9 @@ paths:
                 incrementPercent:
                   type: string
                   example: "1"
-    responses:
-      "201":
-          description: Cycle registered successfully.
+      responses:
+        "201":
+          description: Supplier product registered successfully
           content:
             application/json:
               schema:
@@ -2326,38 +1914,21 @@ paths:
                   message:
                     type: string
                     example: "Category created successfully."
-      "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-      "500":
-        description: Internal server error. An unexpected error occurred on the server.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                error:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: "An internal server error occurred."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/international/changephonenumber.php:
     post:
-      tags:
-        - Dube International
-      summary: Change User PhoneNumber
-      description: Update User PhoneNumber.
+      tags: [Customers]
+      summary: Change Phone Number
+      description: Update user phone number
+      operationId: changePhoneNumber
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2378,9 +1949,9 @@ paths:
                 dialCode:
                   type: string
                   example: "255"
-    responses:
-      "201":
-          description: Update PhoneNumber successfully.
+      responses:
+        "200":
+          description: Phone number updated successfully
           content:
             application/json:
               schema:
@@ -2392,38 +1963,21 @@ paths:
                   message:
                     type: string
                     example: "PhoneNumber updated successfully."
-      "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-      "500":
-        description: Internal server error. An unexpected error occurred on the server.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                error:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: "An internal server error occurred."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/changename.php:
     post:
-      tags:
-        - Dube International
-      summary: Change User PhoneNumber
-      description: Update User PhoneNumber.
+      tags: [Customers]
+      summary: Change User Name
+      description: Update user full name
+      operationId: changeUserName
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2440,9 +1994,9 @@ paths:
                 fullName:
                   type: string
                   example: "John Doe"
-    responses:
-      "201":
-          description: Update Full Name successfully.
+      responses:
+        "200":
+          description: User name updated successfully
           content:
             application/json:
               schema:
@@ -2454,38 +2008,21 @@ paths:
                   message:
                     type: string
                     example: "Full Name updated successfully."
-      "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-      "500":
-        description: Internal server error. An unexpected error occurred on the server.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                error:
-                  type: boolean
-                  example: true
-                message:
-                  type: string
-                  example: "An internal server error occurred."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getcustomercredithistory.php:
     post:
-      tags:
-        - Dube International
-      summary: Get All Customer Credit History
-      description: Retrive an existing All Open Invoices list
+      tags: [Customers]
+      summary: Get Customer Credit History
+      description: Retrieve customer credit transaction history
+      operationId: getCustomerCreditHistory
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2510,15 +2047,13 @@ paths:
                   example: "2024-12-31"
                 limit:
                   type: integer
-                  format: int32
                   example: 10
                 offset:
                   type: integer
-                  format: int32
                   example: 0
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Credit history retrieved successfully
           content:
             application/json:
               schema:
@@ -2535,10 +2070,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionId: 
+                        transactionId:
                           type: string
                           example: "DW12345678AbC1234"
-                        senderName: 
+                        senderName:
                           type: string
                           example: "HelloDube"
                         senderMobile:
@@ -2552,40 +2087,22 @@ paths:
                           example: "PROCESSED"
                         transactionDate:
                           type: string
-                          format: date-time
                           example: "2024-11-15 14:46:27"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getpaymenthistory.php:
     post:
-      tags:
-        - Dube International
-      summary: Get All Payment History
-      description: Retrive an existing Payment History
+      tags: [Payments]
+      summary: Get Payment History
+      description: Retrieve payment transaction history
+      operationId: getPaymentHistory
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2610,15 +2127,13 @@ paths:
                   example: "2024-12-31"
                 limit:
                   type: integer
-                  format: int32
                   example: 10
                 offset:
                   type: integer
-                  format: int32
                   example: 0
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Payment history retrieved successfully
           content:
             application/json:
               schema:
@@ -2635,10 +2150,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionId: 
+                        transactionId:
                           type: string
                           example: "DW12345678AbC1234"
-                        payerName: 
+                        payerName:
                           type: string
                           example: "HelloDube"
                         payerMobile:
@@ -2655,43 +2170,25 @@ paths:
                           example: "PROCESSED"
                         transactionDate:
                           type: string
-                          format: date-time
                           example: "2024-11-15 14:46:27"
                         remark:
                           type: string
                           example: "invoice"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/international/updatereceiptstatus.php:
     post:
-      tags:
-        - Dube International
+      tags: [Invoices]
       summary: Update Receipt Status
-      description: Update Receipt Status
+      description: Update receipt verification status
+      operationId: updateReceiptStatus
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2707,11 +2204,11 @@ paths:
                   example: "7Gq5Xaje-XGMQ-CjaX-ZoDI-cmQnUR4My4bs"
                 status:
                   type: string
-                  enum: "1 | 0"
+                  enum: ["1", "0"]
                   example: "1"
       responses:
-        "201":
-          description: Receipt Updated successfully.
+        "200":
+          description: Receipt status updated successfully
           content:
             application/json:
               schema:
@@ -2724,37 +2221,20 @@ paths:
                     type: string
                     example: "Receipt Updated successfully."
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getcashouthistory.php:
     post:
-      tags:
-        - Dube International
-      summary: Get Single Cashout History
-      description: Retrive Get Single Cashout History
+      tags: [Wallets]
+      summary: Get Cashout History
+      description: Retrieve specific cashout transaction details
+      operationId: getCashoutHistory
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2762,8 +2242,8 @@ paths:
             schema:
               type: object
               required:
-              - wallet
-              - id
+                - wallet
+                - id
               properties:
                 wallet:
                   type: string
@@ -2772,8 +2252,8 @@ paths:
                   type: string
                   example: "DW12345678AbC1234"
       responses:
-        "201":
-          description: Receipt Updated successfully.
+        "200":
+          description: Cashout history retrieved successfully
           content:
             application/json:
               schema:
@@ -2785,10 +2265,10 @@ paths:
                   message:
                     type: object
                     properties:
-                      wallet: 
+                      wallet:
                         type: string
                         example: "2299401133"
-                      name: 
+                      name:
                         type: string
                         example: "hello shop"
                       mobile:
@@ -2819,37 +2299,20 @@ paths:
                             type: string
                             example: "Successfully Transfered."
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /dube/getcustomerlistofmerchant.php:
     post:
-      tags:
-        - Dube International
-      summary: Get Single Customer list of Merchant
-      description: Retrive Get Single Customer list of Merchant
+      tags: [Merchants]
+      summary: Get Merchant's Customers
+      description: Retrieve customer list for a specific merchant
+      operationId: getMerchantCustomers
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -2857,14 +2320,14 @@ paths:
             schema:
               type: object
               required:
-              - mobile
+                - mobile
               properties:
                 mobile:
                   type: string
                   example: "251900000000"
       responses:
-        "201":
-          description: Receipt Updated successfully.
+        "200":
+          description: Merchant customers retrieved successfully
           content:
             application/json:
               schema:
@@ -2876,10 +2339,10 @@ paths:
                   message:
                     type: object
                     properties:
-                      userId: 
+                      userId:
                         type: string
                         example: "123456"
-                      walletType: 
+                      walletType:
                         type: string
                         example: "CUSTOMER_CREDIT"
                       fullname:
@@ -2888,7 +2351,7 @@ paths:
                       mobile:
                         type: string
                         example: "251900000000"
-                      wallet: 
+                      wallet:
                         type: string
                         example: "2299401133"
                       balance:
@@ -2909,22 +2372,44 @@ paths:
                       creditRepayment:
                         type: array
                         example: []
-                      
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
+          $ref: "#/components/responses/InternalServerError500"
+
+  /dube/international/customerselfregistration.php:
+    post:
+      tags: [Customers]
+      summary: Customer Self Registration
+      description: Allow customers to register themselves
+      operationId: customerSelfRegistration
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mobile
+                - fullName
+                - dialCode
+              properties:
+                fullName:
+                  type: string
+                  example: "Zemedkun Alemu"
+                mobile:
+                  type: string
+                  example: "+25191234567"
+                dialCode:
+                  type: string
+                  example: "ET"
+      responses:
+        "201":
+          description: Customer registered successfully
           content:
             application/json:
               schema:
@@ -2932,19 +2417,31 @@ paths:
                 properties:
                   error:
                     type: boolean
-                    example: true
+                    example: false
                   message:
                     type: string
-                    example: "An internal server error occurred."
+                    example: "User Register Successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
+  # ========================
+  # 🌍 WFP OPERATIONS
+  # ========================
   /wfp/generatedummyvouchers.php:
     get:
-      tags:
-        - WFP
-      summary: Get Generate Dummy Vouchers
-      description: Get an existing All Generate Dummy Vouchers
+      tags: [WFP Operations]
+      summary: Generate Dummy Vouchers
+      description: Generate test vouchers for development
+      operationId: generateDummyVouchers
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Dummy vouchers generated successfully
           content:
             application/json:
               schema:
@@ -2958,54 +2455,36 @@ paths:
                     items:
                       type: object
                       properties:
-                        userId: 
+                        userId:
                           type: string
                           example: "123456"
-                        balance: 
+                        balance:
                           type: number
                           example: 895
-                        createdOn: 
+                        createdOn:
                           type: string
-                          format: date-time
                           example: "2025-02-14 06:14:56"
-                        creditWallet: 
+                        creditWallet:
                           type: string
                           example: "9289473512"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getcategories.php:
     get:
-      tags:
-        - WFP
-      summary: Fetch Food Categories
-      description: Retrieves the list of food categories.
+      tags: [WFP Operations]
+      summary: Get Food Categories
+      description: Retrieve WFP food categories and subcategories
+      operationId: getFoodCategories
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: Successful response with food categories.
+        "200":
+          description: Food categories retrieved successfully
           content:
             application/json:
               schema:
@@ -3019,15 +2498,15 @@ paths:
                     items:
                       type: object
                       properties:
-                        Category: 
+                        Category:
                           type: string
                           example: "PLW"
-                        SubCategory: 
+                        SubCategory:
                           type: array
                           items:
                             type: object
                             properties:
-                              id: 
+                              id:
                                 type: string
                                 example: "11b5cf1c-eda5-0a68-7cd0-675c1b485a8f"
                               name:
@@ -3037,40 +2516,23 @@ paths:
                                 type: string
                                 example: "78.75"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getbeneficiarylist.php:
     get:
-      tags:
-        - WFP
-      summary: Get Beneficiary list
-      description: Get All Beneficiary list
+      tags: [WFP Operations]
+      summary: Get Beneficiary List
+      description: Retrieve list of WFP beneficiaries
+      operationId: getBeneficiaryList
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: Successful response with Beneficiary list.
+        "200":
+          description: Beneficiary list retrieved successfully
           content:
             application/json:
               schema:
@@ -3087,10 +2549,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        mainWallet: 
+                        mainWallet:
                           type: string
                           example: "1198916900"
-                        beneficiaryName: 
+                        beneficiaryName:
                           type: string
                           example: "Solomon waleligh"
                         mobile:
@@ -3113,60 +2575,24 @@ paths:
                               cycle:
                                 type: string
                                 example: "Test Cycle-2"
-                          example:
-                          - walletName: "Oil"
-                            walletBalance: "100.00"
-                            cycle: "Test Cycle-2"
-                          - walletName: "Eggs"
-                            walletBalance: "100.00"
-                            cycle: "Test Cycle-2"
-                          - walletName: "Vegetables"
-                            walletBalance: "100.00"
-                            cycle: "Test Cycle-2"
-                          - walletName: "Cereal"
-                            walletBalance: "100.00"
-                            cycle: "Test Cycle-2"
-                          - walletName: "Pulses"
-                            walletBalance: "100.00"
-                            cycle: "Test Cycle-2"
-                          - walletName: "Salt"
-                            walletBalance: "100.00"
-                            cycle: "Test Cycle-2"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getvoucherslist.php:
     get:
-      tags:
-        - WFP
+      tags: [WFP Operations]
       summary: Get Vouchers List
-      description: Get All Vouchers List
+      description: Retrieve list of all vouchers
+      operationId: getVouchersList
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: Successful response with Vouchers List.
+        "200":
+          description: Vouchers list retrieved successfully
           content:
             application/json:
               schema:
@@ -3183,10 +2609,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        householdId: 
+                        householdId:
                           type: string
                           example: "ETNUT000000"
-                        name: 
+                        name:
                           type: string
                           example: "Solomon waleligh"
                         mobile:
@@ -3205,11 +2631,9 @@ paths:
                           example: "600.00"
                         updatedOn:
                           type: string
-                          format: date-time
                           example: "2025-02-14 06:23:47"
                         createdOn:
                           type: string
-                          format: date-time
                           example: "2025-02-14 06:23:47"
                         linked:
                           type: boolean
@@ -3221,40 +2645,23 @@ paths:
                           type: string
                           example: "Test Cycle-2"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getallcycles.php:
     get:
-      tags:
-        - WFP
+      tags: [WFP Operations]
       summary: Get All Cycles
-      description: Get All Cycles
+      description: Retrieve all program cycles
+      operationId: getAllCycles
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Cycles retrieved successfully
           content:
             application/json:
               schema:
@@ -3271,10 +2678,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        id: 
+                        id:
                           type: string
                           example: "RUdxSUC9-PhW5-3MDW-5uuI-mOTiaYyjAQN0"
-                        cycle: 
+                        cycle:
                           type: string
                           example: "Cycle-13 SSC"
                         active:
@@ -3282,47 +2689,28 @@ paths:
                           example: "1"
                         startDate:
                           type: string
-                          format: date-time
                           example: "2025-02-14"
                         endDate:
                           type: string
-                          format: date-time
                           example: "2025-02-14"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getallinvoices.php:
     get:
-      tags:
-        - WFP
-      summary:  Fetch Invoices Summary
-      description: Retrieves a summary of invoices.
+      tags: [WFP Operations]
+      summary: Get WFP Invoices
+      description: Retrieve WFP-specific invoices
+      operationId: getWfpInvoices
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: Successful response with invoices summary.
+        "200":
+          description: WFP invoices retrieved successfully
           content:
             application/json:
               schema:
@@ -3339,13 +2727,13 @@ paths:
                     items:
                       type: object
                       properties:
-                        transactionId: 
+                        transactionId:
                           type: string
                           example: "WFPWP8923034201839"
                         merchantUserId:
                           type: string
                           example: "123456"
-                        merchantName: 
+                        merchantName:
                           type: string
                           example: "Gesese Molla"
                         merchantMobile:
@@ -3354,10 +2742,10 @@ paths:
                         householdId:
                           type: string
                           example: "ETNUT000000"
-                        customerName: 
+                        customerName:
                           type: string
                           example: "Mulushewa Moges"
-                        customerMobile: 
+                        customerMobile:
                           type: string
                           example: "251913663497"
                         amount:
@@ -3372,59 +2760,43 @@ paths:
                         remark:
                           type: array
                           items:
+                            type: object
                             properties:
                               categoryName:
-                                  type: string
-                                  example: "Oil"
+                                type: string
+                                example: "Oil"
                               order:
-                                  type: array
-                                  items:
-                                    type: object
-                                    properties:
-                                      itemName:
-                                        type: string
-                                        example: "Oil"
-                                      unitPrice:
-                                        type: string
-                                        example: "100.00"
-                                      quantity:
-                                        type: string
-                                        example: "2"
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    itemName:
+                                      type: string
+                                      example: "Oil"
+                                    unitPrice:
+                                      type: string
+                                      example: "100.00"
+                                    quantity:
+                                      type: string
+                                      example: "2"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/gettotalinvoices.php:
     get:
-      tags:
-        - WFP
+      tags: [WFP Operations]
       summary: Get Total Invoices
-      description: Get an existing Total Invoices
+      description: Retrieve WFP invoice totals
+      operationId: getTotalInvoices
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Invoice totals retrieved successfully
           content:
             application/json:
               schema:
@@ -3438,47 +2810,30 @@ paths:
                     items:
                       type: object
                       properties:
-                        totalAmount: 
+                        totalAmount:
                           type: string
                           example: "200,291,934.04"
                         totalNumber:
                           type: string
                           example: "143700"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/gettotalcredit.php:
     get:
-      tags:
-        - WFP
-      summary: Fetch Credits Summary
-      description: Retrieves a summary of credits.
+      tags: [WFP Operations]
+      summary: Get Total Credit
+      description: Retrieve WFP credit totals
+      operationId: getTotalCredit
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: Successful response with credits summary.
+        "200":
+          description: Credit totals retrieved successfully
           content:
             application/json:
               schema:
@@ -3492,48 +2847,31 @@ paths:
                     items:
                       type: object
                       properties:
-                        totalAmount: 
+                        totalAmount:
                           type: string
                           example: "200,291,934.04"
                         totalNumber:
                           type: string
                           example: "143700"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getcashouttotals.php:
     get:
-      tags:
-        - WFP
-      summary: Fetch Cashouts
-      description: Retrieves cashout transactions with optional filters
+      tags: [WFP Operations]
+      summary: Get Cashout Totals
+      description: Retrieve WFP cashout statistics
+      operationId: getCashoutTotals
+      security:
+        - bearerAuth: []
       parameters:
         - name: voucher
           in: query
-          description: Voucher code or ID
+          description: Voucher code filter
           required: false
           schema:
             type: string
@@ -3543,33 +2881,13 @@ paths:
           required: false
           schema:
             type: integer
-            default: 0
-        - name: dateFrom
-          in: query
-          description: Start date filter (YYYY-MM-DD)
-          required: false
-          schema:
-            type: string
-            format: date
-            nullable: true
-        - name: dateTo
-          in: query
-          description: End date filter (YYYY-MM-DD)
-          required: false
-          schema:
-            type: string
-            format: date
-            nullable: true
-        - name: limit
-          in: query
-          description: Number of records per page
-          required: false
-          schema:
-            type: integer
-            default: 10
+            example: 0
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - $ref: "#/components/parameters/PaginationLimit"
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Cashout totals retrieved successfully
           content:
             application/json:
               schema:
@@ -3583,53 +2901,36 @@ paths:
                     items:
                       type: object
                       properties:
-                        totalCashoutAmount: 
+                        totalCashoutAmount:
                           type: string
                           example: "200,291,934.04"
                         totalCashoutNumber:
                           type: string
                           example: "143700"
-                        totalCashoutFeeAmount: 
+                        totalCashoutFeeAmount:
                           type: string
                           example: "92010.93919999992"
                         totalCashoutFeeNumber:
                           type: string
                           example: "143700"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getcashouthistory.php:
     get:
-      tags:
-        - WFP
-      summary: Fetch Cashout Summary
-      description: Retrieves a summary of cashouts
+      tags: [WFP Operations]
+      summary: Get WFP Cashout History
+      description: Retrieve WFP cashout transaction history
+      operationId: getWfpCashoutHistory
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: Successful response with cashout summary
+        "200":
+          description: Cashout history retrieved successfully
           content:
             application/json:
               schema:
@@ -3643,7 +2944,7 @@ paths:
                     example: "7"
                   message:
                     type: array
-                    items: 
+                    items:
                       type: object
                       properties:
                         wallet:
@@ -3674,90 +2975,65 @@ paths:
                           type: string
                           example: "1000"
                         transactionData:
-                            type: object
-                            properties: 
-                              error: 
-                                type: string
-                                example: "WFPWP8923034201839"
-                              message:
-                                type: string
-                                example: "143700"
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: "WFPWP8923034201839"
+                            message:
+                              type: string
+                              example: "143700"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getcredittransferhistory.php:
     get:
-      tags:
-        - WFP
-      summary: Fetch Credit Transfer History
-      description: Retrieves credit transfer history with optional filters.
+      tags: [WFP Operations]
+      summary: Get Credit Transfer History
+      description: Retrieve WFP credit transfer history
+      operationId: getCreditTransferHistory
+      security:
+        - bearerAuth: []
       parameters:
         - name: walletId
           in: query
+          description: Wallet identifier
+          required: false
           schema:
             type: string
-          description: Unique ID of the wallet.
         - name: offset
           in: query
+          description: Pagination offset
+          required: false
           schema:
             type: integer
-          description: Pagination offset.
         - name: houseHoldId
           in: query
+          description: Household identifier
+          required: false
           schema:
             type: string
-          description: Unique ID of the household.
         - name: householdId
           in: query
-          schema:
-            type: string
-          description: Household ID filter.
-        - name: dateTo
-          in: query
-          description: End date filter (YYYY-MM-DD)
+          description: Household ID filter
           required: false
           schema:
             type: string
-            format: date
-            nullable: true
-        - name: limit
-          in: query
-          description: Number of records per page
-          required: false
-          schema:
-            type: integer
-            default: 10
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - $ref: "#/components/parameters/PaginationLimit"
         - name: cycle
           in: query
+          description: Program cycle filter
+          required: false
           schema:
             type: string
-          description: Cycle filter.
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Credit transfer history retrieved successfully
           content:
             application/json:
               schema:
@@ -3771,7 +3047,7 @@ paths:
                     example: "7"
                   message:
                     type: array
-                    items: 
+                    items:
                       type: object
                       properties:
                         transactionId:
@@ -3805,40 +3081,23 @@ paths:
                           type: string
                           example: "1000"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/getonboardingagentlist.php:
     get:
-      tags:
-        - WFP
-      summary: Get Total CashOut Totals
-      description: Get an existing Total Credit
+      tags: [WFP Operations]
+      summary: Get Onboarding Agent List
+      description: Retrieve list of onboarding agents
+      operationId: getOnboardingAgentList
+      security:
+        - bearerAuth: []
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Onboarding agents retrieved successfully
           content:
             application/json:
               schema:
@@ -3852,7 +3111,7 @@ paths:
                     example: "7"
                   message:
                     type: array
-                    items: 
+                    items:
                       type: object
                       properties:
                         name:
@@ -3868,40 +3127,26 @@ paths:
                           type: string
                           example: "2024-01-01"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/gettotals.php:
     get:
-      tags:
-        - WFP
-      summary: Get All Users
-      description: Get an existing All Users
+      tags: [WFP Operations]
+      summary: Get WFP Totals
+      description: Retrieve comprehensive WFP statistics
+      operationId: getWfpTotals
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: WFP totals retrieved successfully
           content:
             application/json:
               schema:
@@ -3915,100 +3160,77 @@ paths:
                     items:
                       type: object
                       properties:
-                        totalCashoutAmount: 
+                        totalCashoutAmount:
                           type: string
                           example: "2082"
-                        totalCashoutNumber: 
+                        totalCashoutNumber:
                           type: number
                           example: 77056
-                        totalCreditAmount: 
+                        totalCreditAmount:
                           type: string
                           example: "2796"
-                        totalCreditNumber: 
+                        totalCreditNumber:
                           type: string
                           example: "77059"
-                        totalInvoiceAmount: 
+                        totalInvoiceAmount:
                           type: string
                           example: "635"
-                        totalInvoiceNumber: 
+                        totalInvoiceNumber:
                           type: string
                           example: "36307"
-                        totalBenefitedMerchantAmount: 
+                        totalBenefitedMerchantAmount:
                           type: string
                           example: "537"
-                        totalBenefitedMerchantNumber: 
+                        totalBenefitedMerchantNumber:
                           type: string
                           example: "137"
-                        totalBenefitedBeneficiaryAmount: 
+                        totalBenefitedBeneficiaryAmount:
                           type: number
                           example: 69255702.57
-                        totalBenefitedBeneficiaryNumber: 
+                        totalBenefitedBeneficiaryNumber:
                           type: string
                           example: "234669"
                         totalPurchases:
                           type: object
-                          properties:                          
-                            Vegetables: 
+                          properties:
+                            Vegetables:
                               type: string
                               example: "1000"
-                            Eggs: 
+                            Eggs:
                               type: string
                               example: "1000"
                             Oil:
                               type: string
                               example: "1000"
-                            Fruits: 
-                              type: string
-                              example: "1000"
-                            Fruits: 
+                            Fruits:
                               type: string
                               example: "1000"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/gethealthofficerlist.php:
     get:
-      tags:
-        - WFP
-      summary: Get Total CashOut Totals
-      description: Get an existing Total Credit
+      tags: [WFP Operations]
+      summary: Get Health Officer List
+      description: Retrieve list of health officers
+      operationId: getHealthOfficerList
+      security:
+        - bearerAuth: []
       parameters:
-        - name: limit
-          in: query
-          schema:
-            type: integer
-          description: Number of results per page.
+        - $ref: "#/components/parameters/PaginationLimit"
         - name: page
           in: query
+          description: Page number for pagination
+          required: false
           schema:
             type: integer
-          description: Page number.
       responses:
-        '200':
-          description: A JSON array of user names
+        "200":
+          description: Health officers retrieved successfully
           content:
             application/json:
               schema:
@@ -4022,7 +3244,7 @@ paths:
                     example: "7"
                   message:
                     type: array
-                    items: 
+                    items:
                       type: object
                       properties:
                         name:
@@ -4038,37 +3260,20 @@ paths:
                           type: string
                           example: "2024-01-01"
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/registercategory.php:
     post:
-      tags:
-        - WFP
-      summary: Register a new category
-      description: Registers a new category with subcategories.
+      tags: [WFP Operations]
+      summary: Register Food Category
+      description: Register new food category with subcategories
+      operationId: registerFoodCategory
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4087,13 +3292,22 @@ paths:
                   type: array
                   items:
                     type: string
-                  example: ["Oil", "Vegetables", "Pulses", "Cereal", "Salt", "Fruits", "Cereals"]
+                  example:
+                    [
+                      "Oil",
+                      "Vegetables",
+                      "Pulses",
+                      "Cereal",
+                      "Salt",
+                      "Fruits",
+                      "Cereals",
+                    ]
                 cycles:
-                    type: string
-                    example: "Daily"
+                  type: string
+                  example: "Daily"
       responses:
         "201":
-          description: Category registered successfully.
+          description: Category registered successfully
           content:
             application/json:
               schema:
@@ -4106,37 +3320,20 @@ paths:
                     type: string
                     example: "Category created successfully."
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/registerCycle:
     post:
-      tags:
-        - WFP
-      summary: Register a new Cycle
-      description: Registers a new cycle with start and end dates.
+      tags: [WFP Operations]
+      summary: Register Program Cycle
+      description: Register new program cycle
+      operationId: registerCycle
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4153,15 +3350,13 @@ paths:
                   example: "Oil"
                 startDate:
                   type: string
-                  formate: date-time
                   example: "2022-01-01T00:00:00Z"
                 endDate:
                   type: string
-                  formate: date-time
                   example: "2022-01-01T00:00:00Z"
       responses:
         "201":
-          description: Cycle registered successfully.
+          description: Cycle registered successfully
           content:
             application/json:
               schema:
@@ -4174,37 +3369,20 @@ paths:
                     type: string
                     example: "Category created successfully."
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."  
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/updatecycle.php:
     post:
-      tags:
-        - WFP
-      summary: Register a new category
-      description: Adds a new category with its subcategories and cycle information.
+      tags: [WFP Operations]
+      summary: Update Program Cycle
+      description: Update existing program cycle
+      operationId: updateCycle
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4219,12 +3397,11 @@ paths:
                   type: string
                   example: "Ywh8Epr6-CDd3-PgQs-BcRr-vtRYzr8GlTP4"
                 endDate:
-                  type: array
-                  formate: date-time
+                  type: string
                   example: "2025-02-14"
       responses:
-        "201":
-          description: Category registered successfully.
+        "200":
+          description: Cycle updated successfully
           content:
             application/json:
               schema:
@@ -4237,37 +3414,20 @@ paths:
                     type: string
                     example: "Category created successfully."
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/registerhealthofficer.php:
     post:
-      tags:
-        - WFP
+      tags: [WFP Operations]
       summary: Register Health Officer
-      description: Adds a new Health Officer with its subcategories and cycle information.
+      description: Register new health officer
+      operationId: registerHealthOfficer
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4279,12 +3439,11 @@ paths:
                   type: string
                   example: "Sintayehu Adane"
                 hoMobile:
-                  type: array
-                  formate: date-time
+                  type: string
                   example: "+251940302084"
       responses:
         "201":
-          description: Health Officer registered successfully.
+          description: Health officer registered successfully
           content:
             application/json:
               schema:
@@ -4297,37 +3456,20 @@ paths:
                     type: string
                     example: "Category created successfully."
         "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
         "500":
-          description: Internal server error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "An internal server error occurred."
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/changebeneficiarystatus.php:
     post:
-      tags:
-        - WFP
+      tags: [WFP Operations]
       summary: Change Beneficiary Status
-      description: Updates the status of a beneficiary household.
+      description: Update beneficiary active status
+      operationId: changeBeneficiaryStatus
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4345,51 +3487,34 @@ paths:
                   type: string
                   example: "ACTIVE"
       responses:
-          "201":
-            description: Resource created successfully.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: false
-                    message:
-                      type: string
-                      example: "Resource created successfully."
-          "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-          "500":
-            description: Internal server error. An unexpected error occurred on the server.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "An internal server error occurred."
+        "200":
+          description: Beneficiary status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Resource created successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/registeronboardingagents.php:
     post:
-      tags:
-        - WFP
+      tags: [WFP Operations]
       summary: Register Onboarding Agent
-      description: Create Onboarding Agent.
+      description: Register new onboarding agent
+      operationId: registerOnboardingAgent
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4404,54 +3529,37 @@ paths:
                   type: string
                   example: "John Doe"
                 agentMobile:
-                  type: array
-                  formate: date-time
+                  type: string
+                  example: "+251940302084"
       responses:
-          "201":
-            description: Resource Created successfully.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: false
-                    message:
-                      type: string
-                      example: "Resource created successfully."
-          "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-          "500":
-            description: Internal server error. An unexpected error occurred on the server.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "An internal server error occurred."
+        "201":
+          description: Onboarding agent registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Resource created successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/updateonboardingagent.php:
     post:
-      tags:
-        - WFP
-      summary: Change Onboarding Agent
-      description: Updates Onboarding Agent.
+      tags: [WFP Operations]
+      summary: Update Onboarding Agent
+      description: Update onboarding agent status
+      operationId: updateOnboardingAgent
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4469,51 +3577,34 @@ paths:
                   type: string
                   example: "1"
       responses:
-          "201":
-            description: Resource Update successfully.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: false
-                    message:
-                      type: string
-                      example: "Resource Updated successfully."
-          "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-          "500":
-            description: Internal server error. An unexpected error occurred on the server.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "An internal server error occurred."
+        "200":
+          description: Onboarding agent updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Resource Updated successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/updatefoodcategorylist.php:
     post:
-      tags:
-        - WFP
-      summary: Change Food Category List
-      description: Updates Food Category List.
+      tags: [WFP Operations]
+      summary: Update Food Category List
+      description: Update merchant food category assignments
+      operationId: updateFoodCategoryList
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4531,53 +3622,45 @@ paths:
                   type: array
                   items:
                     type: string
-                  example: ["Oil", "Vegetables", "Pulses", "Cereal", "Salt", "Fruits", "Cereals"]
+                  example:
+                    [
+                      "Oil",
+                      "Vegetables",
+                      "Pulses",
+                      "Cereal",
+                      "Salt",
+                      "Fruits",
+                      "Cereals",
+                    ]
       responses:
-          "201":
-            description: Resource Update successfully.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: false
-                    message:
-                      type: string
-                      example: "Resource Updated successfully."
-          "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-          "500":
-            description: Internal server error. An unexpected error occurred on the server.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "An internal server error occurred."
+        "200":
+          description: Food category list updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Resource Updated successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/cancelcycle.php:
     post:
-      tags:
-        - WFP
-      summary: Delete a Cycle
-      description: Cancel Cycle.
+      tags: [WFP Operations]
+      summary: Cancel Program Cycle
+      description: Cancel/delete existing program cycle
+      operationId: cancelCycle
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4585,106 +3668,68 @@ paths:
             schema:
               type: object
               required:
-              - cycleId
+                - cycleId
               properties:
                 cycleId:
                   type: string
                   example: "Ywh8Epr6-CDd3-PgQs-BcRr-vtRYzr8GlTP4"
       responses:
-          "201":
-            description: Resource Deleted successfully.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: false
-                    message:
-                      type: string
-                      example: "Resource Deleted successfully."
-          "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-          "500":
-            description: Internal server error. An unexpected error occurred on the server.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "An internal server error occurred."
+        "200":
+          description: Cycle cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Resource Deleted successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
   /wfp/transfercredit.php:
     post:
-      tags:
-        - WFP
-      summary: Top-Up Creadit
-      description: Top-Up Creadit.
+      tags: [WFP Operations]
+      summary: Transfer Credit
+      description: Transfer credit to beneficiary
+      operationId: transferCredit
+      security:
+        - bearerAuth: []
       parameters:
-      - name: walletId
-        in: query
-        description: Unique ID of the wallet
-        required: true
-        schema:
-          type: string
-      - name: houseHoldId
-        in: query
-        description: Unique ID of the household
-        required: false
-        schema:
-          type: string
-      - name: offset
-        in: query
-        description: Pagination offset
-        required: false
-        schema:
-          type: integer
-          default: 0
-      - name: dateFrom
-        in: query
-        description: Start date filter (YYYY-MM-DD)
-        required: false
-        schema:
-          type: string
-          format: date
-          nullable: true
-      - name: dateTo
-        in: query
-        description: End date filter (YYYY-MM-DD)
-        required: false
-        schema:
-          type: string
-          format: date
-          nullable: true
-      - name: cycleFilter
-        in: query
-        description: Filter transactions by cycle (e.g., daily, weekly, monthly)
-        required: false
-        schema:
-          type: string
-      - name: limit
-        in: query
-        description: Number of records per page
-        required: false
-        schema:
-          type: integer
-          default: 10
+        - name: walletId
+          in: query
+          description: Wallet identifier
+          required: true
+          schema:
+            type: string
+        - name: houseHoldId
+          in: query
+          description: Household identifier
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - name: cycleFilter
+          in: query
+          description: Cycle filter
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/PaginationLimit"
       requestBody:
         required: true
         content:
@@ -4692,8 +3737,8 @@ paths:
             schema:
               type: object
               required:
-              - householdId
-              - cycle
+                - householdId
+                - cycle
               properties:
                 householdId:
                   type: string
@@ -4702,42 +3747,98 @@ paths:
                   type: string
                   example: "Ywh8Epr6-CDd3-PgQs-BcRr-vtRYzr8GlTP4"
       responses:
-          "201":
-            description: Resource Deleted successfully.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: false
-                    message:
-                      type: string
-                      example: "Resource Deleted successfully."
-          "400":
-            description: Bad request. The provided data is invalid or missing required fields.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "No content passed."
-          "500":
-            description: Internal server error. An unexpected error occurred on the server.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "An internal server error occurred."
+        "200":
+          description: Credit transferred successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Resource Deleted successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
+  /wfp/validatedisbursement.php:
+    post:
+      tags: [WFP Operations]
+      summary: Validate Disbursement
+      description: Validate credit disbursement
+      operationId: validateDisbursement
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: walletId
+          in: query
+          description: Wallet identifier
+          required: true
+          schema:
+            type: string
+        - name: houseHoldId
+          in: query
+          description: Household identifier
+          required: false
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/DateRangeStart"
+        - $ref: "#/components/parameters/DateRangeEnd"
+        - name: cycleFilter
+          in: query
+          description: Cycle filter
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/PaginationLimit"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - householdId
+                - cycle
+              properties:
+                householdId:
+                  type: string
+                  example: "Z876543210"
+                cycle:
+                  type: string
+                  example: "Ywh8Epr6-CDd3-PgQs-BcRr-vtRYzr8GlTP4"
+      responses:
+        "200":
+          description: Disbursement validated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Resource Deleted successfully."
+        "400":
+          $ref: "#/components/responses/BadRequest400"
+        "401":
+          $ref: "#/components/responses/Unauthorized401"
+        "500":
+          $ref: "#/components/responses/InternalServerError500"
+
+security:
+  - bearerAuth: []
